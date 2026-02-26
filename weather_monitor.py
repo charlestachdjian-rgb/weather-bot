@@ -62,6 +62,8 @@ MIDDAY_HOUR   = 12   # Noon reassessment window
 
 # Ceiling NO gap and T2 buffers
 CEIL_GAP            = 2.0   # gap for late-day ceiling NO
+FORECAST_KILL_BUFFER = 4.0  # T2 forecast gap requirement (active trading)
+FORECAST_KILL_BUFFER_TIGHT = 3.5  # Tighter T2 buffer for Paris (dormant - collecting data)
 UPPER_KILL_BUFFER   = 5.0   # T2 Upper: upper bracket must be ≥5°C above adjusted forecast
 MIDDAY_KILL_BUFFER  = 2.5   # Midday T2: tighter buffer with 6h of real data
 DYNAMIC_BIAS_DANGER = 1.0   # if morning bias > this, OM is underforecasting
@@ -690,6 +692,32 @@ def detect_signals(markets: list[dict],
                     "daily_high":  daily_high,
                     "forecast_high": forecast_high,
                     "token_id":    m.get("no_token_id", ""),
+                })
+        
+        # ── Layer 2b: FLOOR_NO_FORECAST_TIGHT (T2 Lower with 3.5°C buffer - DORMANT) ───
+        # Tighter buffer validated on 8 Paris days (33 signals, 0 wrong)
+        # Dormant - collecting data for 30+ days before activating
+        # Only fires if regular T2 (4.0°C) didn't fire
+        elif (hi is not None
+                and forecast_high is not None
+                and forecast_high - hi >= FORECAST_KILL_BUFFER_TIGHT
+                and forecast_high - hi < FORECAST_KILL_BUFFER
+                and yes > MIN_YES_FOR_ALERT
+                and CITY == "paris"):  # Only for Paris initially
+            skip_reason = None
+            if om_trend == "FALLING" and hour_local < 12:
+                skip_reason = "OM trend FALLING in morning"
+            if not skip_reason:
+                # Log but don't trade
+                logger.info("T2_TIGHT DORMANT (would fire): %s gap=%.1f°C YES=%.1f%% [3.5°C buffer]",
+                           label, forecast_high - hi, yes * 100)
+                log_event({
+                    "event": "dormant_signal",
+                    "type": "FLOOR_NO_FORECAST_TIGHT",
+                    "range": label,
+                    "yes_price": yes,
+                    "gap": round(forecast_high - hi, 1),
+                    "note": f"[T2 TIGHT — DORMANT] forecast={forecast_high}°C, bracket_top={hi}°C, gap={forecast_high - hi:.1f}°C"
                 })
 
         # ── Layer 3: T2_UPPER (upper brackets killed by low forecast) ───────
