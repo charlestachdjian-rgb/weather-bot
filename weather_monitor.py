@@ -70,7 +70,7 @@ DYNAMIC_BIAS_DANGER = 1.0   # if morning bias > this, OM is underforecasting
 SUM_TOL = 0.07   # flag if sum of YES prices deviates > 7% from 1.0
 
 # Minimum YES price to bother alerting on a guaranteed-NO opportunity
-MIN_YES_FOR_ALERT = 0.03  # if YES < 3 cents, edge is too small
+MIN_YES_FOR_ALERT = 0.01  # if YES < 1 cent, edge is too small
 
 LOCAL_TZ = ZoneInfo("Europe/Paris")
 
@@ -135,6 +135,16 @@ _dynamic_bias: float | None = None     # actual − OM average over morning hour
 _dynamic_forecast: float | None = None # forecast_high + max(0, dynamic_bias)
 _midday_reassessment_done: bool = False
 
+# Daily statistics tracking (for daily summary)
+_daily_stats = {
+    "signals_fired": 0,
+    "signals_blocked": 0,
+    "wu_high": None,
+    "wu_low": None,
+    "synop_high": None,
+    "synop_low": None,
+}
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def log_event(record: dict) -> None:
@@ -168,11 +178,15 @@ def maybe_reset_daily_high() -> None:
     global _forecast_high_c, _morning_summary_sent
     global _om_hourly_forecast, _metar_readings, _synop_readings
     global _dynamic_bias, _dynamic_forecast, _midday_reassessment_done
+    global _daily_stats
     today = now_local().date()
     if _current_date is None:
         _current_date = today
         return
     if today != _current_date:
+        # Log daily summary before resetting
+        _log_daily_summary(_current_date)
+        
         logger.info("New day (%s). Resetting daily high (was %.1f°C).", today, daily_high_c or 0)
         daily_high_c          = None
         _current_date         = today
@@ -186,6 +200,14 @@ def maybe_reset_daily_high() -> None:
         _dynamic_bias         = None
         _dynamic_forecast     = None
         _midday_reassessment_done = False
+        _daily_stats = {
+            "signals_fired": 0,
+            "signals_blocked": 0,
+            "wu_high": None,
+            "wu_low": None,
+            "synop_high": None,
+            "synop_low": None,
+        }
 
 
 # ── Weather fetching ──────────────────────────────────────────────────────────
@@ -706,6 +728,7 @@ def detect_signals(markets: list[dict],
                 if om_hourly_max_adj is not None and om_hourly_max_adj >= lo - 1.0:
                     reasons.append(f"OM adj max {om_hourly_max_adj:.1f}°C near bracket")
                 logger.info("T2_UPPER BLOCKED on %s: %s", label, "; ".join(reasons))
+                _daily_stats["signals_blocked"] += 1
 
         # ── Layer 3b: T2 Upper for exact brackets ───────────────────────────
         if (lo is not None
@@ -815,6 +838,7 @@ def detect_signals(markets: list[dict],
                     # })
                 else:
                     logger.info("CEIL_NO BLOCKED on %s: %s", label, "; ".join(reasons))
+                    _daily_stats["signals_blocked"] += 1
 
         # ── Layer 5: LOCKED_IN_YES (REMOVED) ────────────────────────────────
         # LOCKED_IN_YES removed - too risky, never fired in 9 days
@@ -1017,6 +1041,7 @@ async def run_observation(session: aiohttp.ClientSession) -> None:
         if sig_key in _fired_signals:
             continue
         _fired_signals.add(sig_key)
+        _daily_stats["signals_fired"] += 1  # Track daily signals
 
         tier = sig.get("tier", 0)
         tier_tag = f" [TIER {tier}]" if tier else ""
@@ -1116,6 +1141,51 @@ async def _send_morning_summary(session: aiohttp.ClientSession,
     msg = "\n".join(lines)
     logger.info("MORNING SUMMARY:\n%s", msg)
     await notify_telegram(session, msg)
+
+
+def _log_daily_summary(summary_date: date) -> None:
+    """Log daily summary with data quality metrics."""
+    global _daily_stats, daily_high_c, _metar_readings, _synop_readings
+    global _forecast_high_c, _dynamic_bias
+    
+    # Calculate SYNOP high/low from readings
+    synop_high = max((r["temp"] for r in _synop_readings), default=None) if _synop_readings else None
+    synop_low = min((r["temp"] for r in _synop_readings), default=None) if _synop_readings else None
+    
+    # Calculate METAR low from readings (high is tracked as daily_high_c)
+    metar_low = min((r["temp"] for r in _metar_readings), default=None) if _metar_readings else None
+    
+    # Calculate actual OM error if we have both forecast and actual
+    actual_om_error = None
+    if _forecast_high_c is not None and daily_high_c is not None:
+        # forecast_high_c already includes +1.0°C bias correction
+        # So error = actual - (OM_raw + 1.0) = actual - forecast_high_c
+        actual_om_error = round(daily_high_c - _forecast_high_c, 1)
+    
+    summary = {
+        "type": "daily_summary",
+        "date": summary_date.isoformat(),
+        "city": CITY,
+        "wu_high": daily_high_c,  # METAR = WU (verified perfect correlation)
+        "wu_low": metar_low,
+        "synop_high": synop_high,
+        "synop_low": synop_low,
+        "openmeteo_forecast_high": _forecast_high_c,
+        "openmeteo_bias_correction": OPENMETEO_BIAS_CORRECTION,
+        "corrected_forecast": _forecast_high_c,
+        "actual_om_error": actual_om_error,
+        "dynamic_bias_9am": _dynamic_bias,
+        "signals_fired": _daily_stats["signals_fired"],
+        "signals_blocked": _daily_stats["signals_blocked"],
+        "metar_readings_count": len(_metar_readings),
+        "synop_readings_count": len(_synop_readings),
+    }
+    
+    log_event(summary)
+    logger.info("DAILY SUMMARY for %s: high=%.1f°C, forecast=%.1f°C, error=%s°C, signals=%d",
+                summary_date, daily_high_c or 0, _forecast_high_c or 0, 
+                actual_om_error if actual_om_error is not None else "?",
+                _daily_stats["signals_fired"])
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
