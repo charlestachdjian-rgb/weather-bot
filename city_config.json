@@ -1,0 +1,68 @@
+{
+  "paris": {
+    "slug": "paris",
+    "timezone": "Europe/Paris",
+    "metar_station": "LFPG",
+    "synop_station": "07157",
+    "lat": 49.0097,
+    "lon": 2.5479,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  },
+  "london": {
+    "slug": "london",
+    "timezone": "Europe/London",
+    "metar_station": "EGLL",
+    "synop_station": "03772",
+    "lat": 51.4700,
+    "lon": -0.4543,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  },
+  "nyc": {
+    "slug": "nyc",
+    "timezone": "America/New_York",
+    "metar_station": "KLGA",
+    "synop_station": "72503",
+    "lat": 40.7769,
+    "lon": -73.8740,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  },
+  "seoul": {
+    "slug": "seoul",
+    "timezone": "Asia/Seoul",
+    "metar_station": "RKSI",
+    "synop_station": "47108",
+    "lat": 37.4602,
+    "lon": 126.4407,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  },
+  "ankara": {
+    "slug": "ankara",
+    "timezone": "Europe/Istanbul",
+    "metar_station": "LTAC",
+    "synop_station": "17130",
+    "lat": 40.1281,
+    "lon": 32.9951,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  },
+  "toronto": {
+    "slug": "toronto",
+    "timezone": "America/Toronto",
+    "metar_station": "CYYZ",
+    "synop_station": "71624",
+    "lat": 43.6772,
+    "lon": -79.6306,
+    "openmeteo_bias": 1.0,
+    "poll_min_day": 5,
+    "poll_min_night": 15
+  }
+}
