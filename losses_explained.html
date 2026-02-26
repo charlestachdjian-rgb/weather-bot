@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The 4 Losing Trades — Explained</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 24px; color: #e6edf3; margin-bottom: 4px; }
+  h2 { font-size: 18px; color: #e6edf3; margin: 32px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  h3 { font-size: 14px; color: #e6edf3; margin-bottom: 10px; }
+  .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 24px; }
+  .green { color: #2ecc71; } .red { color: #e74c3c; }
+
+  .summary-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin: 16px 0; display: flex; gap: 30px; flex-wrap: wrap; }
+  .summary-stat { text-align: center; }
+  .summary-stat .big { font-size: 28px; font-weight: 700; }
+  .summary-stat .label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .trade-card { background: #161b22; border-radius: 12px; margin: 20px 0; overflow: hidden; }
+  .card-ceil { border: 1px solid #e74c3c; }
+  .card-lock { border: 1px solid #58a6ff; }
+
+  .trade-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #21262d; }
+  .trade-num { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e; }
+  .trade-title { flex: 1; font-size: 16px; font-weight: 600; color: #e6edf3; }
+  .trade-loss { font-size: 16px; font-weight: 700; color: #e74c3c; }
+
+  .trade-body { display: flex; gap: 0; }
+  .chart-col { flex: 1; min-width: 400px; padding: 12px; }
+  .steps-col { flex: 1; min-width: 300px; padding: 16px 20px; border-left: 1px solid #21262d; }
+
+  .step { display: flex; gap: 10px; margin: 8px 0; }
+  .step-icon { font-size: 18px; min-width: 28px; text-align: center; padding-top: 2px; }
+  .step-body { flex: 1; }
+  .step-time { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+  .step-text { font-size: 13px; color: #c9d1d9; }
+
+  .lesson { padding: 14px 20px; background: #1c1208; border-top: 1px solid #d29922; font-size: 13px; color: #f0d060; }
+
+  .takeaway { background: linear-gradient(135deg, #0d2818, #161b22); border: 2px solid #238636; border-radius: 10px; padding: 20px; margin: 24px 0; }
+  .takeaway h3 { color: #2ecc71; font-size: 16px; margin-bottom: 10px; }
+  .takeaway ul { margin: 8px 0 0 20px; font-size: 13px; }
+  .takeaway li { margin: 6px 0; }
+  .takeaway .safe { color: #2ecc71; font-weight: 600; }
+  .takeaway .risky { color: #e74c3c; font-weight: 600; }
+
+  @media (max-width: 800px) {
+    .trade-body { flex-direction: column; }
+    .steps-col { border-left: none; border-top: 1px solid #21262d; }
+    .chart-col { min-width: unset; }
+    .steps-col { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>The 4 Losing Trades — Explained</h1>
+<div class="subtitle">
+  Out of 53 trades across 8 days, 4 lost money. Here's exactly what went wrong in each one.
+</div>
+
+<div class="summary-box">
+  <div class="summary-stat">
+    <div class="big">53</div>
+    <div class="label">Total trades</div>
+  </div>
+  <div class="summary-stat">
+    <div class="big green">49</div>
+    <div class="label">Winners</div>
+  </div>
+  <div class="summary-stat">
+    <div class="big red">4</div>
+    <div class="label">Losers</div>
+  </div>
+  <div class="summary-stat">
+    <div class="big green">$0.00</div>
+    <div class="label">Floor NO losses</div>
+  </div>
+  <div class="summary-stat">
+    <div class="big red">-$0.10</div>
+    <div class="label">Ceiling NO losses</div>
+  </div>
+  <div class="summary-stat">
+    <div class="big red">-$3.20</div>
+    <div class="label">Locked-In YES losses</div>
+  </div>
+</div>
+
+<p style="font-size:14px; margin:16px 0; padding:14px 18px; background:#161b22; border:1px solid #30363d; border-radius:8px;">
+  <strong>Quick reminder on how bets work:</strong>
+  When you buy NO at $0.95 (because YES costs $0.05), you pay $95 per $100 of shares.
+  If the bracket resolves NO, you collect $100 — profit $5.
+  <span class="red">If the bracket resolves YES, your shares are worth $0 — you lose the full $95.</span>
+  The same applies in reverse for YES bets.
+</p>
+
+<h2>The Losers</h2>
+
+
+    <div class="trade-card card-ceil">
+      <div class="trade-header">
+        <div class="trade-num">Trade #1</div>
+        <div class="trade-title">Ceiling NO on >=7°C — February 15</div>
+        <div class="trade-loss">Lost $0.00</div>
+      </div>
+
+      <div class="trade-body">
+        <div class="chart-col">
+          <div id="chart0" style="height:300px;"></div>
+          <script>
+          Plotly.newPlot('chart0', [
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 8],
+              type: 'scatter', mode: 'lines+markers', name: 'Temperature',
+              line: {color: '#e74c3c', width: 2}, marker: {size: 3},
+              hovertemplate: '%{x}: %{y}°C<extra></extra>'
+            },
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 9],
+              type: 'scatter', mode: 'lines', name: 'Running High',
+              line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+              hovertemplate: 'Running high: %{y}°C<extra></extra>'
+            }
+          ], {
+            paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9', size: 11 },
+            margin: { l: 40, r: 20, t: 10, b: 40 },
+            xaxis: { gridcolor: '#21262d' },
+            yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+            legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+            hovermode: 'x unified',
+            shapes: [{
+              type: 'line', x0: '16:00', x1: '16:00',
+              y0: 0, y1: 1, yref: 'paper',
+              line: { color: '#e74c3c', width: 2, dash: 'dot' }
+            }],
+            annotations: [{
+              x: '16:00', y: 1, yref: 'paper',
+              text: 'Ceiling NO fires', showarrow: false,
+              font: { color: '#e74c3c', size: 10 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              xanchor: 'left', yanchor: 'top', xshift: 5
+            },
+            {
+              x: '23:30', y: 9,
+              text: 'Actual high: 9°C', showarrow: true,
+              arrowcolor: '#e74c3c', arrowhead: 2,
+              font: { color: '#e74c3c', size: 11 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              ax: -60, ay: -20
+            }]
+          }, { responsive: true, displayModeBar: false });
+          </script>
+        </div>
+
+        <div class="steps-col">
+          <h3>What happened</h3>
+          
+        <div class="step">
+          <div class="step-icon">🌡️</div>
+          <div class="step-body">
+            <div class="step-time">All day</div>
+            <div class="step-text">Temperature has been low all day. At 16:00 CET, the running high is only <strong>3°C</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🔴</div>
+          <div class="step-body">
+            <div class="step-time">16:00</div>
+            <div class="step-text"><strong>Ceiling NO triggers.</strong> The <strong>>=7°C</strong> bracket starts at 7°C — that's 4°C above the running high. The strategy says: "It's 4pm, temperature can't climb 4°C more. This bracket is dead."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">💰</div>
+          <div class="step-body">
+            <div class="step-time">16:00</div>
+            <div class="step-text">We buy NO on <strong>>=7°C</strong>. The market prices YES at 100%, so NO costs <strong>$0.00</strong> per $100 of shares.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">📈</div>
+          <div class="step-body">
+            <div class="step-time">Evening</div>
+            <div class="step-text"><strong>But the temperature keeps climbing!</strong> A late warm front pushes the temp from 3°C all the way up to <strong>9°C</strong> by midnight.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">❌</div>
+          <div class="step-body">
+            <div class="step-time">Resolution</div>
+            <div class="step-text">The >=7°C bracket resolves <strong>YES</strong> (actual high 9°C ≥ 7°C). Our NO shares are worthless. <strong>We lose $0.00.</strong></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="lesson">
+        <strong>Lesson:</strong> The market already knew this bracket would likely resolve YES (priced at 100%). Our NO was cheap ($0.00), so the loss was tiny. But if the market had been uncertain (YES at 50%), we'd have lost $50.
+      </div>
+    </div>
+    
+    <div class="trade-card card-lock">
+      <div class="trade-header">
+        <div class="trade-num">Trade #2</div>
+        <div class="trade-title">Locked-In YES on 3°C — February 15</div>
+        <div class="trade-loss">Lost $2.50</div>
+      </div>
+
+      <div class="trade-body">
+        <div class="chart-col">
+          <div id="chart1" style="height:300px;"></div>
+          <script>
+          Plotly.newPlot('chart1', [
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 8],
+              type: 'scatter', mode: 'lines+markers', name: 'Temperature',
+              line: {color: '#e74c3c', width: 2}, marker: {size: 3},
+              hovertemplate: '%{x}: %{y}°C<extra></extra>'
+            },
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 9],
+              type: 'scatter', mode: 'lines', name: 'Running High',
+              line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+              hovertemplate: 'Running high: %{y}°C<extra></extra>'
+            }
+          ], {
+            paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9', size: 11 },
+            margin: { l: 40, r: 20, t: 10, b: 40 },
+            xaxis: { gridcolor: '#21262d' },
+            yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+            legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+            hovermode: 'x unified',
+            shapes: [{
+              type: 'line', x0: '17:00', x1: '17:00',
+              y0: 0, y1: 1, yref: 'paper',
+              line: { color: '#58a6ff', width: 2, dash: 'dot' }
+            }],
+            annotations: [{
+              x: '17:00', y: 1, yref: 'paper',
+              text: 'Locked-In YES fires', showarrow: false,
+              font: { color: '#58a6ff', size: 10 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#58a6ff',
+              xanchor: 'left', yanchor: 'top', xshift: 5
+            },
+            {
+              x: '23:30', y: 9,
+              text: 'Actual high: 9°C', showarrow: true,
+              arrowcolor: '#e74c3c', arrowhead: 2,
+              font: { color: '#e74c3c', size: 11 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              ax: -60, ay: -20
+            }]
+          }, { responsive: true, displayModeBar: false });
+          </script>
+        </div>
+
+        <div class="steps-col">
+          <h3>What happened</h3>
+          
+        <div class="step">
+          <div class="step-icon">🌡️</div>
+          <div class="step-body">
+            <div class="step-time">All day</div>
+            <div class="step-text">It's been a cold day. At 17:00 CET, the running high is <strong>3°C</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🔵</div>
+          <div class="step-body">
+            <div class="step-time">17:00</div>
+            <div class="step-text"><strong>Locked-In YES triggers.</strong> The running high of 3°C falls in the <strong>3°C</strong> bracket. The strategy says: "It's 5pm, the daily high is set. This bracket will win."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">💰</div>
+          <div class="step-body">
+            <div class="step-time">17:00</div>
+            <div class="step-text">We buy YES on <strong>3°C</strong> at 2.5% — that's <strong>$2.50</strong> per $100 of shares.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">📈</div>
+          <div class="step-body">
+            <div class="step-time">Evening</div>
+            <div class="step-text"><strong>But the temperature surges!</strong> It climbs from 3°C to <strong>9°C</strong>. The daily high is no longer 3°C — it's 9°C.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">❌</div>
+          <div class="step-body">
+            <div class="step-time">Resolution</div>
+            <div class="step-text">The winning bracket is <strong>>=7°C</strong>, not 3°C. Our YES shares on 3°C are worthless. <strong>We lose $2.50.</strong></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="lesson">
+        <strong>Lesson:</strong> At 5pm, the market only priced this bracket at 2.5% — it already suspected the high wasn't final. We bet against the market and lost. The loss was small ($2.50) only because YES was cheap.
+      </div>
+    </div>
+    
+    <div class="trade-card card-ceil">
+      <div class="trade-header">
+        <div class="trade-num">Trade #3</div>
+        <div class="trade-title">Ceiling NO on >=8°C — February 18</div>
+        <div class="trade-loss">Lost $0.00</div>
+      </div>
+
+      <div class="trade-body">
+        <div class="chart-col">
+          <div id="chart2" style="height:300px;"></div>
+          <script>
+          Plotly.newPlot('chart2', [
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+              type: 'scatter', mode: 'lines+markers', name: 'Temperature',
+              line: {color: '#e74c3c', width: 2}, marker: {size: 3},
+              hovertemplate: '%{x}: %{y}°C<extra></extra>'
+            },
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+              type: 'scatter', mode: 'lines', name: 'Running High',
+              line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+              hovertemplate: 'Running high: %{y}°C<extra></extra>'
+            }
+          ], {
+            paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9', size: 11 },
+            margin: { l: 40, r: 20, t: 10, b: 40 },
+            xaxis: { gridcolor: '#21262d' },
+            yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+            legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+            hovermode: 'x unified',
+            shapes: [{
+              type: 'line', x0: '16:00', x1: '16:00',
+              y0: 0, y1: 1, yref: 'paper',
+              line: { color: '#e74c3c', width: 2, dash: 'dot' }
+            }],
+            annotations: [{
+              x: '16:00', y: 1, yref: 'paper',
+              text: 'Ceiling NO fires', showarrow: false,
+              font: { color: '#e74c3c', size: 10 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              xanchor: 'left', yanchor: 'top', xshift: 5
+            },
+            {
+              x: '23:30', y: 9,
+              text: 'Actual high: 9°C', showarrow: true,
+              arrowcolor: '#e74c3c', arrowhead: 2,
+              font: { color: '#e74c3c', size: 11 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              ax: -60, ay: -20
+            }]
+          }, { responsive: true, displayModeBar: false });
+          </script>
+        </div>
+
+        <div class="steps-col">
+          <h3>What happened</h3>
+          
+        <div class="step">
+          <div class="step-icon">🌡️</div>
+          <div class="step-body">
+            <div class="step-time">All day</div>
+            <div class="step-text">Temperature has been low all day. At 16:00 CET, the running high is only <strong>5°C</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🔴</div>
+          <div class="step-body">
+            <div class="step-time">16:00</div>
+            <div class="step-text"><strong>Ceiling NO triggers.</strong> The <strong>>=8°C</strong> bracket starts at 8°C — that's 3°C above the running high. The strategy says: "It's 4pm, temperature can't climb 3°C more. This bracket is dead."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">💰</div>
+          <div class="step-body">
+            <div class="step-time">16:00</div>
+            <div class="step-text">We buy NO on <strong>>=8°C</strong>. The market prices YES at 100%, so NO costs <strong>$0.00</strong> per $100 of shares.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">📈</div>
+          <div class="step-body">
+            <div class="step-time">Evening</div>
+            <div class="step-text"><strong>But the temperature keeps climbing!</strong> A late warm front pushes the temp from 5°C all the way up to <strong>9°C</strong> by midnight.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">❌</div>
+          <div class="step-body">
+            <div class="step-time">Resolution</div>
+            <div class="step-text">The >=8°C bracket resolves <strong>YES</strong> (actual high 9°C ≥ 8°C). Our NO shares are worthless. <strong>We lose $0.00.</strong></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="lesson">
+        <strong>Lesson:</strong> The market already knew this bracket would likely resolve YES (priced at 100%). Our NO was cheap ($0.00), so the loss was tiny. But if the market had been uncertain (YES at 50%), we'd have lost $50.
+      </div>
+    </div>
+    
+    <div class="trade-card card-lock">
+      <div class="trade-header">
+        <div class="trade-num">Trade #4</div>
+        <div class="trade-title">Locked-In YES on 6°C — February 18</div>
+        <div class="trade-loss">Lost $0.80</div>
+      </div>
+
+      <div class="trade-body">
+        <div class="chart-col">
+          <div id="chart3" style="height:300px;"></div>
+          <script>
+          Plotly.newPlot('chart3', [
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+              type: 'scatter', mode: 'lines+markers', name: 'Temperature',
+              line: {color: '#e74c3c', width: 2}, marker: {size: 3},
+              hovertemplate: '%{x}: %{y}°C<extra></extra>'
+            },
+            {
+              x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+              type: 'scatter', mode: 'lines', name: 'Running High',
+              line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+              hovertemplate: 'Running high: %{y}°C<extra></extra>'
+            }
+          ], {
+            paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9', size: 11 },
+            margin: { l: 40, r: 20, t: 10, b: 40 },
+            xaxis: { gridcolor: '#21262d' },
+            yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+            legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+            hovermode: 'x unified',
+            shapes: [{
+              type: 'line', x0: '17:00', x1: '17:00',
+              y0: 0, y1: 1, yref: 'paper',
+              line: { color: '#58a6ff', width: 2, dash: 'dot' }
+            }],
+            annotations: [{
+              x: '17:00', y: 1, yref: 'paper',
+              text: 'Locked-In YES fires', showarrow: false,
+              font: { color: '#58a6ff', size: 10 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#58a6ff',
+              xanchor: 'left', yanchor: 'top', xshift: 5
+            },
+            {
+              x: '23:30', y: 9,
+              text: 'Actual high: 9°C', showarrow: true,
+              arrowcolor: '#e74c3c', arrowhead: 2,
+              font: { color: '#e74c3c', size: 11 },
+              bgcolor: 'rgba(13,17,23,0.9)', bordercolor: '#e74c3c',
+              ax: -60, ay: -20
+            }]
+          }, { responsive: true, displayModeBar: false });
+          </script>
+        </div>
+
+        <div class="steps-col">
+          <h3>What happened</h3>
+          
+        <div class="step">
+          <div class="step-icon">🌡️</div>
+          <div class="step-body">
+            <div class="step-time">All day</div>
+            <div class="step-text">It's been a cold day. At 17:00 CET, the running high is <strong>6°C</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🔵</div>
+          <div class="step-body">
+            <div class="step-time">17:00</div>
+            <div class="step-text"><strong>Locked-In YES triggers.</strong> The running high of 6°C falls in the <strong>6°C</strong> bracket. The strategy says: "It's 5pm, the daily high is set. This bracket will win."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">💰</div>
+          <div class="step-body">
+            <div class="step-time">17:00</div>
+            <div class="step-text">We buy YES on <strong>6°C</strong> at 0.8% — that's <strong>$0.80</strong> per $100 of shares.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">📈</div>
+          <div class="step-body">
+            <div class="step-time">Evening</div>
+            <div class="step-text"><strong>But the temperature surges!</strong> It climbs from 6°C to <strong>9°C</strong>. The daily high is no longer 6°C — it's 9°C.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">❌</div>
+          <div class="step-body">
+            <div class="step-time">Resolution</div>
+            <div class="step-text">The winning bracket is <strong>>=8°C</strong>, not 6°C. Our YES shares on 6°C are worthless. <strong>We lose $0.80.</strong></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="lesson">
+        <strong>Lesson:</strong> At 5pm, the market only priced this bracket at 0.8% — it already suspected the high wasn't final. We bet against the market and lost. The loss was small ($0.80) only because YES was cheap.
+      </div>
+    </div>
+    
+
+<h2>Why Both Losing Days Look the Same</h2>
+<div style="background:#161b22; border:1px solid #30363d; border-radius:10px; padding:20px; margin:16px 0; font-size:14px;">
+  <p>Both Feb 15 and Feb 18 share an unusual pattern: <strong>the temperature peaked late at night, not in the afternoon.</strong></p>
+  <p style="margin-top:10px">Normally in February, the daily high occurs between 12pm-4pm as the sun heats the ground. But on these two days, a warm air mass arrived in the evening, pushing temperatures up after sunset. This broke two assumptions:</p>
+  <ul style="margin: 10px 0 0 20px;">
+    <li><strong>Ceiling NO (4pm):</strong> assumed the temperature wouldn't climb 2°C+ more after 4pm</li>
+    <li><strong>Locked-In YES (5pm):</strong> assumed the running high at 5pm was the final daily high</li>
+  </ul>
+  <p style="margin-top:10px">On both days, the temperature surged <strong>+4°C to +6°C after 5pm</strong>. This is rare but clearly happens in Paris winter.</p>
+</div>
+
+<div class="takeaway">
+  <h3>Takeaway: What's Safe, What's Risky</h3>
+  <ul>
+    <li><span class="safe">Floor NO — Tier 1</span>: <strong>Zero losses, ever.</strong> Once the running high passes a threshold, it can never go back. This is a mathematical certainty. The edge per trade is small (pennies) but there is no risk.</li>
+    <li><span class="safe">Floor NO — Tier 2</span>: <strong>Zero losses in our data.</strong> Would only lose if the forecast is wrong by 4°C+. Very unlikely but not impossible.</li>
+    <li><span class="risky">Ceiling NO</span>: Lost 2 times. The losses were tiny ($0.05) only because the market had already priced YES near 100%. If the market is unsure (YES at 30-50%), a wrong Ceiling NO could lose $50-$70 per $100 bet. <strong>The 4pm cutoff is too early for Paris winter.</strong></li>
+    <li><span class="risky">Locked-In YES</span>: Lost 2 times. The losses were small ($0.75-$2.45) only because YES was cheap. If we'd bought YES at 50%, we'd have lost $50. <strong>The 5pm cutoff is far too early</strong> — temperature surged +4-6°C after 5pm on both losing days.</li>
+  </ul>
+  <p style="margin-top:12px; font-size:13px; color:#8b949e;">
+    <strong>Recommendation:</strong> Only use Floor NO (Tier 1 + Tier 2) for real money.
+    Ceiling NO and Locked-In YES could work with much later cutoff times (10pm+) or with additional
+    safeguards (declining temperature trend confirmed by SYNOP), but the current parameters are unsafe.
+  </p>
+</div>
+
+</div>
+</body>
+</html>

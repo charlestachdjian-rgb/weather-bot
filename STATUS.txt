@@ -1,0 +1,64 @@
+================================================================================
+PROJECT: weather-bot
+SCRIPT:  weather_monitor.py   (currently RUNNING)
+================================================================================
+
+WHAT WE ARE TRYING TO DO
+-------------------------
+Test whether real-time weather data is ever meaningfully ahead of Polymarket's
+NYC daily high temperature markets.
+
+The theory: Polymarket runs markets like "Will NYC high temp be 38-39°F on Feb 21?"
+with multiple range sub-markets. These markets are resolved using Weather Underground
+data from LaGuardia Airport (KLGA). If the observed temperature is clearly converging
+toward one range but the market price hasn't caught up yet, there may be a brief
+window to buy the correct range at a discount.
+
+HOW IT WORKS
+------------
+- Fetches current temperature observations from KLGA (LaGuardia) via METAR/NOAA
+- Fetches active NYC daily high temperature markets from Polymarket Gamma API
+- Compares current observed temp and daily high-so-far to each market's range prices
+- Logs all observations to weather_log.jsonl every 15 minutes
+- Highlights if current observed temp suggests a specific range is likely
+
+RESOLUTION SOURCE
+-----------------
+Polymarket resolves NYC temperature markets using Weather Underground data for
+LaGuardia Airport (KLGA). We use the same station so our data matches.
+
+MARKET STRUCTURE
+----------------
+Each day has one event with ~9 sub-markets, e.g.:
+  "Will NYC high be 34-35°F on Feb 21?" — YES price: 0.02
+  "Will NYC high be 36-37°F on Feb 21?" — YES price: 0.82
+  "Will NYC high be 38-39°F on Feb 21?" — YES price: 0.15
+  ...etc.
+Exactly one sub-market resolves YES. The YES prices should sum to ~1.0.
+
+WHAT IS CURRENTLY HAPPENING
+-----------------------------
+- Bot is running and collecting observations every 15 minutes
+- Logging current temp, daily high, and all sub-market prices
+- No orders placed — data collection only
+
+KNOWN CONSTRAINTS
+-----------------
+- Temperature markets resolve at end of day. The "edge window" is narrow:
+  only useful if the market hasn't yet priced in a clear temperature trend.
+- By mid-afternoon, the likely range is usually very obvious and well-priced.
+- The best opportunity would be early morning when yesterday's data is fresh but
+  today's market hasn't opened or is thinly traded.
+- Weather forecasts (from the NWS or Weather.com) are also public — the market
+  probably incorporates those. Only REAL-TIME observed data creates a small edge.
+
+NEXT STEPS
+----------
+1. After 1-2 weeks of data, review weather_log.jsonl.
+2. Find days where at 9am or 10am, the observed temp already clearly pointed to
+   one range, but the market price was still spread across 2-3 ranges.
+3. Estimate: how much edge was available and for how long?
+4. If consistently > 5 cents edge available for > 30 minutes: automate the entry.
+5. Consider adding NWS hourly forecast data as a second signal (forecast vs. observed).
+
+================================================================================

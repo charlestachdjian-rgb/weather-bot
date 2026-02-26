@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paris Temperature Forecast - Feb 23, 2026</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #0d1117; 
+            color: #c9d1d9; 
+            padding: 24px; 
+            line-height: 1.6; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 24px; color: #e6edf3; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #8b949e; margin-bottom: 24px; }
+        .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0 30px; }
+        .kpi { 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            padding: 14px 18px; 
+            flex: 1; 
+            min-width: 160px; 
+        }
+        .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e; }
+        .kpi .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .kpi .detail { font-size: 11px; color: #8b949e; margin-top: 2px; }
+        .green { color: #2ecc71; } .red { color: #e74c3c; } .yellow { color: #f1c40f; } .blue { color: #3498db; }
+        .chart-container { 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 16px 0; 
+        }
+        .chart-title { font-size: 16px; color: #e6edf3; margin-bottom: 16px; }
+        .signal-table { 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 20px 0; 
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { 
+            text-align: left; 
+            padding: 10px 12px; 
+            border-bottom: 2px solid #30363d; 
+            color: #8b949e; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+        }
+        td { padding: 8px 12px; border-bottom: 1px solid #21262d; }
+        tr:hover { background: #1c2333; }
+        .signal-t1 { color: #2ecc71; font-weight: 600; }
+        .signal-t2 { color: #f1c40f; font-weight: 600; }
+        .signal-ceil { color: #e74c3c; font-weight: 600; }
+        .signal-lock { color: #3498db; font-weight: 600; }
+        .bracket-dead { color: #8b949e; text-decoration: line-through; }
+        .time-marker { 
+            background: #238636; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            font-weight: 600; 
+            margin-right: 6px; 
+        }
+        .insight-box { 
+            background: #0d2818; 
+            border: 1px solid #238636; 
+            border-radius: 8px; 
+            padding: 16px; 
+            margin: 16px 0; 
+        }
+        .insight-title { color: #2ecc71; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .warning-box { 
+            background: #2d1b0e; 
+            border: 1px solid #d29922; 
+            border-radius: 8px; 
+            padding: 16px; 
+            margin: 16px 0; 
+        }
+        .warning-title { color: #d29922; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Paris Temperature Forecast - Feb 23, 2026</h1>
+        <div class="subtitle">
+            Based on Open-Meteo forecast with +1°C bias correction | Generated on Feb 22, 2026
+        </div>
+        
+        <div class="kpi-row">
+            <div class="kpi">
+                <div class="label">Forecast High</div>
+                <div class="value yellow">14.4°C</div>
+                <div class="detail">Open-Meteo +1.0°C bias</div>
+            </div>
+            <div class="kpi">
+                <div class="label">Peak Time</div>
+                <div class="value">14:00</div>
+                <div class="detail">Expected daily maximum</div>
+            </div>
+            <div class="kpi">
+                <div class="label">Morning Temp</div>
+                <div class="value">12.7°C</div>
+                <div class="detail">6:00-9:00 CET</div>
+            </div>
+            <div class="kpi">
+                <div class="label">Evening Temp</div>
+                <div class="value">11.9°C</div>
+                <div class="detail">21:00 CET</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">24-Hour Temperature Forecast</div>
+            <div id="tempChart" style="height: 500px;"></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Bracket Analysis vs Forecast</div>
+            <div id="bracketChart" style="height: 600px;"></div>
+        </div>
+        
+        <div class="signal-table">
+            <div class="chart-title">Trading Signal Timeline</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Signal Type</th>
+                        <th>Bracket</th>
+                        <th>Action</th>
+                        <th>Condition</th>
+                        <th>Expected YES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="time-marker">09:00</span></td>
+                        <td class="signal-t2">Floor NO T2</td>
+                        <td>≤6°C, ≤7°C, ≤8°C, ≤9°C, ≤10°C</td>
+                        <td>Buy NO</td>
+                        <td>Forecast gap ≥4°C</td>
+                        <td>0.1-2.0%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-marker">12:00</span></td>
+                        <td class="signal-t2">Midday T2</td>
+                        <td>11°C, 12°C</td>
+                        <td>Buy NO</td>
+                        <td>Running high gap ≥2.5°C</td>
+                        <td>0.5-10.0%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-marker">14:00</span></td>
+                        <td></td>
+                        <td>14°C</td>
+                        <td>Monitor</td>
+                        <td>Temperature peaks</td>
+                        <td>~40-60%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-marker">16:00</span></td>
+                        <td class="signal-ceil">Ceiling NO</td>
+                        <td>≥16°C, ≥17°C</td>
+                        <td>Buy NO</td>
+                        <td>Gap ≥2°C + guards pass</td>
+                        <td>1.0-5.0%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="time-marker">17:00</span></td>
+                        <td class="signal-lock">Locked-In YES</td>
+                        <td>14°C</td>
+                        <td>Buy YES</td>
+                        <td>Bracket locked + guards</td>
+                        <td>&lt;80%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="insight-box">
+            <div class="insight-title">Key Trading Opportunities</div>
+            <p><strong>1. Morning Tier 2 (9:00):</strong> Brackets ≤10°C have 4.4-8.4°C gap to forecast - mathematically safe if forecast accurate.</p>
+            <p><strong>2. Noon Reassessment (12:00):</strong> Running high should be ~13.7°C - check brackets 11°C & 12°C for Midday T2.</p>
+            <p><strong>3. Afternoon Peak (14:00):</strong> Temperature peaks at 14.4°C - 14°C bracket becomes current range.</p>
+            <p><strong>4. Late Day (16:00+):</strong> Ceiling NO on ≥16-17°C brackets after temperature declines.</p>
+        </div>
+        
+        <div class="warning-box">
+            <div class="warning-title">Important Risk Considerations</div>
+            <p><strong>1. Dynamic Bias Check:</strong> Always wait for 9am comparison of METAR vs Open-Meteo.</p>
+            <p><strong>2. SYNOP Trend:</strong> Monitor 0.1°C precision data - rising trend blocks late signals.</p>
+            <p><strong>3. OM Peak Timing:</strong> Forecast peaks at 14:00 - wait 2 hours after peak for Ceiling NO.</p>
+            <p><strong>4. Market Efficiency:</strong> These opportunities assume market hasn't fully priced the forecast.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Temperature data
+        const hourlyData = [
+            {hour: 0, temp: 11.9}, {hour: 1, temp: 11.7}, {hour: 2, temp: 11.4},
+            {hour: 3, temp: 11.1}, {hour: 4, temp: 10.8}, {hour: 5, temp: 10.5},
+            {hour: 6, temp: 10.2}, {hour: 7, temp: 10.4}, {hour: 8, temp: 11.1},
+            {hour: 9, temp: 12.7}, {hour: 10, temp: 13.1}, {hour: 11, temp: 13.5},
+            {hour: 12, temp: 13.7}, {hour: 13, temp: 13.9}, {hour: 14, temp: 14.4},
+            {hour: 15, temp: 14.1}, {hour: 16, temp: 13.4}, {hour: 17, temp: 13.1},
+            {hour: 18, temp: 12.9}, {hour: 19, temp: 12.4}, {hour: 20, temp: 12.0},
+            {hour: 21, temp: 11.9}, {hour: 22, temp: 11.7}, {hour: 23, temp: 11.5}
+        ];
+        
+        // Calculate running high
+        let runningHigh = null;
+        const runningHighData = hourlyData.map(point => {
+            if (runningHigh === null || point.temp > runningHigh) {
+                runningHigh = point.temp;
+            }
+            return runningHigh;
+        });
+        
+        // Temperature chart
+        Plotly.newPlot('tempChart', [
+            {
+                x: hourlyData.map(d => d.hour),
+                y: hourlyData.map(d => d.temp),
+                name: 'Temperature',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#3498db', width: 3},
+                marker: {size: 6, color: '#3498db'},
+                hovertemplate: '%{x}:00: %{y:.1f}°C<extra></extra>'
+            },
+            {
+                x: hourlyData.map(d => d.hour),
+                y: runningHighData,
+                name: 'Running High',
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#2ecc71', width: 2, dash: 'dash'},
+                hovertemplate: '%{x}:00: %{y:.1f}°C (daily high)<extra></extra>'
+            },
+            {
+                x: [14, 14],
+                y: [10, 15],
+                name: 'Peak Time',
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#f1c40f', width: 2, dash: 'dot'},
+                showlegend: false,
+                hovertemplate: 'Peak: 14:00<extra></extra>'
+            },
+            {
+                x: [9, 9],
+                y: [10, 15],
+                name: 'T2 Check',
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#f1c40f', width: 1, dash: 'dash'},
+                showlegend: false,
+                hovertemplate: 'Tier 2: 09:00<extra></extra>'
+            },
+            {
+                x: [16, 16],
+                y: [10, 15],
+                name: 'Ceiling NO',
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#e74c3c', width: 1, dash: 'dash'},
+                showlegend: false,
+                hovertemplate: 'Ceiling NO: 16:00<extra></extra>'
+            }
+        ], {
+            paper_bgcolor: '#161b22',
+            plot_bgcolor: '#161b22',
+            font: {color: '#c9d1d9', size: 12},
+            margin: {l: 60, r: 30, t: 30, b: 60},
+            xaxis: {
+                title: 'Hour (CET)',
+                gridcolor: '#21262d',
+                tickmode: 'linear',
+                tick0: 0,
+                dtick: 2,
+                range: [0, 23]
+            },
+            yaxis: {
+                title: 'Temperature (°C)',
+                gridcolor: '#21262d',
+                range: [10, 15]
+            },
+            legend: {
+                bgcolor: 'rgba(22,27,34,0.9)',
+                bordercolor: '#30363d',
+                borderwidth: 1,
+                x: 0.02,
+                y: 0.98
+            },
+            hovermode: 'x unified'
+        }, {responsive: true, displayModeBar: false});
+        
+        // Bracket analysis chart
+        const forecastHigh = 14.4;
+        const brackets = [
+            {label: '≤6°C', value: 6, type: 'floor', gap: forecastHigh - 6},
+            {label: '≤7°C', value: 7, type: 'floor', gap: forecastHigh - 7},
+            {label: '≤8°C', value: 8, type: 'floor', gap: forecastHigh - 8},
+            {label: '≤9°C', value: 9, type: 'floor', gap: forecastHigh - 9},
+            {label: '≤10°C', value: 10, type: 'floor', gap: forecastHigh - 10},
+            {label: '11°C', value: 11, type: 'exact', gap: forecastHigh - 11},
+            {label: '12°C', value: 12, type: 'exact', gap: forecastHigh - 12},
+            {label: '13°C', value: 13, type: 'exact', gap: forecastHigh - 13},
+            {label: '14°C', value: 14, type: 'exact', gap: forecastHigh - 14},
+            {label: '≥15°C', value: 15, type: 'ceiling', gap: 15 - forecastHigh},
+            {label: '≥16°C', value: 16, type: 'ceiling', gap: 16 - forecastHigh},
+            {label: '≥17°C', value: 17, type: 'ceiling', gap: 17 - forecastHigh},
+            {label: '≥18°C', value: 18, type: 'ceiling', gap: 18 - forecastHigh},
+            {label: '≥19°C', value: 19, type: 'ceiling', gap: 19 - forecastHigh}
+        ];
+        
+        // Color coding based on gap
+        const colors = brackets.map(bracket => {
+            if (bracket.type === 'floor' || bracket.type === 'exact') {
+                if (bracket.gap >= 4.0) return '#2ecc71'; // SAFE - T2 target
+                if (bracket.gap >= 2.0) return '#f1c40f'; // WATCH - Midday T2
+                return '#e74c3c'; // RISKY
+            } else { // ceiling
+                if (bracket.gap >= 5.0) return '#2ecc71'; // SAFE - T2 Upper
+                if (bracket.gap >= 2.0) return '#f1c40f'; // WATCH - Ceiling NO
+                return '#e74c3c'; // RISKY
+            }
+        });
+        
+        Plotly.newPlot('bracketChart', [
+            {
+                x: brackets.map(b => b.label),
+                y: brackets.map(b => b.gap),
+                type: 'bar',
+                marker: {
+                    color: colors,
+                    line: {color: '#30363d', width: 1}
+                },
+                text: brackets.map(b => `${Math.abs(b.gap).toFixed(1)}°C ${b.gap > 0 ? 'above' : 'below'} forecast`),
+                textposition: 'auto',
+                hovertemplate: '<b>%{x}</b><br>%{text}<extra></extra>'
+            },
+            {
+                x: ['Forecast', 'Forecast'],
+                y: [0, 0],
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#3498db', width: 2},
+                name: 'Forecast Line',
+                showlegend: false,
+                hoverinfo: 'skip'
+            }
+        ], {
+            paper_bgcolor: '#161b22',
+            plot_bgcolor: '#161b22',
+            font: {color: '#c9d1d9', size: 12},
+            margin: {l: 60, r: 30, t: 30, b: 100},
+            xaxis: {
+                title: 'Temperature Bracket',
+                gridcolor: '#21262d',
+                tickangle: -45
+            },
+            yaxis: {
+                title: 'Gap to Forecast (°C)',
+                gridcolor: '#21262d',
+                zeroline: true,
+                zerolinecolor: '#30363d',
+                zerolinewidth: 2
+            },
+            annotations: [
+                {
+                    x: 4.5,
+                    y: 8,
+                    xref: 'x',
+                    yref: 'y',
+                    text: 'T2 SAFE ZONE<br>(≥4°C gap)',
+                    showarrow: false,
+                    font: {color: '#2ecc71', size: 12},
+                    bgcolor: 'rgba(22,27,34,0.9)',
+                    bordercolor: '#2ecc71',
+                    borderwidth: 1,
+                    borderpad: 4
+                },
+                {
+                    x: 9,
+                    y: 0.5,
+                    xref: 'x',
+                    yref: 'y',
+                    text: 'FORECAST<br>14.4°C',
+                    showarrow: false,
+                    font: {color: '#3498db', size: 12, weight: 'bold'},
+                    bgcolor: 'rgba(22,27,34,0.9)',
+                    bordercolor: '#3498db',
+                    borderwidth: 1,
+                    borderpad: 4
+                },
+                {
+                    x: 11.5,
+                    y: -4,
+                    xref: 'x',
+                    yref: 'y',
+                    text: 'CEILING NO ZONE<br>(≥2°C gap)',
+                    showarrow: false,
+                    font: {color: '#f1c40f', size: 12},
+                    bgcolor: 'rgba(22,27,34,0.9)',
+                    bordercolor: '#f1c40f',
+                    borderwidth: 1,
+                    borderpad: 4
+                }
+            ]
+        }, {responsive: true, displayModeBar: false});
+    </script>
+</body>
+</html>

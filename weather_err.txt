@@ -1,0 +1,14 @@
+17:41:32 [INFO] =================================================================
+17:41:32 [INFO]   NYC TEMPERATURE MARKET MONITOR + SIGNAL DETECTOR
+17:41:32 [INFO] =================================================================
+17:41:32 [INFO]   Weather:  METAR/KLGA (LaGuardia)
+17:41:32 [INFO]   Markets:  Polymarket (resolves via Wunderground/KLGA)
+17:41:32 [INFO]   Poll:     5min (day) / 15min (night)
+17:41:32 [INFO]   Telegram: enabled
+17:41:32 [INFO]   Log:      C:\Users\Charl\Desktop\Cursor\weather-bot\weather_log.jsonl
+17:41:32 [INFO]   Ctrl-C to stop.
+17:41:32 [INFO] =================================================================
+17:41:32 [INFO] KLGA: 34.0F (1.1C) | daily_high=34.0F | 11:41 EST
+17:41:33 [INFO] Markets for highest-temperature-in-nyc-on-february-20-2026: 7 open / 9 total
+17:41:33 [INFO] SIGNAL [SUM_OVERPRICED] 36-37F — edge=0.105 | YES sum=1.105 (+0.105 over 1.0). Most overpriced: 36-37F @ 0.455
+17:41:33 [INFO] Next observation in 5 minutes...

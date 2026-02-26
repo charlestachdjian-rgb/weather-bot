@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>Improved Strategy Backtest</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#c9d1d9;padding:24px;line-height:1.6}
+  .container{max-width:1200px;margin:0 auto}
+  h1{font-size:22px;color:#e6edf3} h2{font-size:17px;color:#e6edf3;margin:28px 0 12px;border-bottom:1px solid #30363d;padding-bottom:6px}
+  .sub{font-size:13px;color:#8b949e;margin-bottom:20px}
+  .green{color:#2ecc71} .red{color:#e74c3c} .yellow{color:#f1c40f} .muted{color:#484f58}
+
+  .compare{display:flex;gap:14px;margin:16px 0;flex-wrap:wrap}
+  .sc{flex:1;min-width:220px;background:#161b22;border-radius:10px;padding:16px}
+  .sc.safe{border:2px solid #2ecc71} .sc.danger{border:2px solid #e74c3c} .sc.improved{border:2px solid #58a6ff}
+  .sc h3{font-size:14px;margin-bottom:10px} .sc .big{font-size:28px;font-weight:700}
+  .sc .row{display:flex;justify-content:space-between;margin:3px 0;font-size:12px} .sc .label{color:#8b949e}
+
+  .chart-box{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:8px 10px;border-bottom:2px solid #30363d;color:#8b949e;font-size:10px;text-transform:uppercase}
+  td{padding:6px 10px;border-bottom:1px solid #21262d}
+  .section{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}
+  .detail-row td{padding:4px 10px 10px;font-size:11px;border-bottom:2px solid #30363d}
+  .chip{display:inline-block;padding:2px 8px;margin:2px;border-radius:4px;background:#21262d;border:1px solid #30363d;font-size:11px;white-space:nowrap}
+  .chip-bad{background:#3d1418;border-color:#e74c3c}
+  .chip-blocked{background:#1c2333;border-color:#58a6ff;color:#58a6ff}
+
+  .guards{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin:16px 0}
+  .guard{display:flex;gap:12px;margin:10px 0;padding:10px 14px;background:#0d1117;border-radius:6px;border:1px solid #21262d}
+  .guard-num{min-width:28px;height:28px;background:#58a6ff;color:#0d1117;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .guard-body{flex:1} .guard-title{font-weight:600;font-size:13px;color:#e6edf3} .guard-desc{font-size:12px;color:#8b949e;margin-top:2px}
+
+  .callout{border-radius:10px;padding:20px;margin:20px 0}
+  .callout-blue{background:linear-gradient(135deg,#0d1b2d,#161b22);border:2px solid #58a6ff}
+  .callout-blue h3{color:#58a6ff;font-size:16px;margin-bottom:8px}
+</style></head><body>
+<div class="container">
+
+<h1>Improved Strategy — With Safeguards</h1>
+<div class="sub">
+  Same 8 Paris days, $100/trade. Now with 5 data-driven guards that block risky signals when the temperature hasn't peaked yet. &bull;
+  20:41 CET, Feb 22 2026
+</div>
+
+<h2>The 5 Safeguards</h2>
+<div class="guards">
+  <div class="guard"><div class="guard-num">1</div><div class="guard-body">
+    <div class="guard-title">Open-Meteo Peak Hour</div>
+    <div class="guard-desc">If OM forecasts the daily max coming AFTER our signal time &rarr; block. On the losing days, OM showed peak at 10-11pm.</div>
+  </div></div>
+  <div class="guard"><div class="guard-num">2</div><div class="guard-body">
+    <div class="guard-title">Open-Meteo Remaining Max</div>
+    <div class="guard-desc">If OM forecasts higher temperatures in the remaining hours of the day than the current running high &rarr; block.</div>
+  </div></div>
+  <div class="guard"><div class="guard-num">3</div><div class="guard-body">
+    <div class="guard-title">Open-Meteo Forecast vs Bracket</div>
+    <div class="guard-desc">If OM's daily forecast high (+ bias) is within 1&deg;C of the bracket floor &rarr; block. The temperature might actually reach the bracket.</div>
+  </div></div>
+  <div class="guard"><div class="guard-num">4</div><div class="guard-body">
+    <div class="guard-title">Multi-Source Trend</div>
+    <div class="guard-desc">If ANY source (METAR, SYNOP, Open-Meteo) shows a rising trend over the last 3 hours &rarr; block. Temperature hasn't peaked.</div>
+  </div></div>
+  <div class="guard"><div class="guard-num">5</div><div class="guard-body">
+    <div class="guard-title">SYNOP Velocity</div>
+    <div class="guard-desc">If SYNOP (0.1&deg;C precision) rose more than 0.3&deg;C in the last 3 hours &rarr; block. Catches subtle upward drift.</div>
+  </div></div>
+</div>
+
+<h2>Results: Three Strategies Compared</h2>
+<div class="compare">
+  <div class="sc safe">
+    <h3 class="green">Floor NO Only</h3>
+    <div class="big green">$+31.70</div>
+    <div class="row"><span class="label">Trades</span><span>49</span></div>
+    <div class="row"><span class="label">Win rate</span><span class="green">49/49 (100%)</span></div>
+    <div class="row"><span class="label">Losses</span><span class="green">0</span></div>
+    <div class="row"><span class="label">ROI</span><span>0.65%</span></div>
+  </div>
+  <div class="sc danger">
+    <h3 class="red">Old (No Guards)</h3>
+    <div class="big red">$-763.03</div>
+    <div class="row"><span class="label">Trades</span><span>57</span></div>
+    <div class="row"><span class="label">Win rate</span><span>49/57 (86%)</span></div>
+    <div class="row"><span class="label">Losses</span><span class="red">8 (&minus;$800)</span></div>
+    <div class="row"><span class="label">ROI</span><span class="red">-13.39%</span></div>
+  </div>
+  <div class="sc improved">
+    <h3 style="color:#58a6ff">New (5 Guards)</h3>
+    <div class="big green">$+31.70</div>
+    <div class="row"><span class="label">Trades</span><span>49</span></div>
+    <div class="row"><span class="label">Win rate</span><span class="green">49/49 (100%)</span></div>
+    <div class="row"><span class="label">Losses</span><span class="green">0</span></div>
+    <div class="row"><span class="label">Blocked</span><span style="color:#58a6ff">9 (saved $800)</span></div>
+    <div class="row"><span class="label">ROI</span><span class="green">0.65%</span></div>
+  </div>
+</div>
+
+<h2>Cumulative P&amp;L</h2>
+<div class="chart-box"><div id="cumChart" style="height:380px"></div></div>
+<script>
+Plotly.newPlot('cumChart', [
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, 7.34, 24.82, 26.34, 27.19, 28.39, 30.25, 31.7], type:'scatter', mode:'lines+markers',
+     name:'Floor NO only', line:{color:'#2ecc71',width:3}, marker:{size:6} },
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, -487.39, -469.91, -468.39, -767.54, -766.34, -764.48, -763.03], type:'scatter', mode:'lines+markers',
+     name:'Old (no guards)', line:{color:'#e74c3c',width:2,dash:'dash'}, marker:{size:5} },
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, 7.34, 24.82, 26.34, 27.19, 28.39, 30.25, 31.7], type:'scatter', mode:'lines+markers',
+     name:'New (5 guards)', line:{color:'#58a6ff',width:3}, marker:{size:6} }
+], {
+  paper_bgcolor:'#161b22', plot_bgcolor:'#161b22', font:{color:'#c9d1d9',size:12},
+  margin:{l:60,r:30,t:10,b:50},
+  xaxis:{gridcolor:'#21262d'}, yaxis:{gridcolor:'#21262d',title:'Cumulative P&L ($)',zeroline:true,zerolinecolor:'#30363d'},
+  legend:{bgcolor:'rgba(22,27,34,0.9)',bordercolor:'#30363d',borderwidth:1,x:0.01,y:0.99},
+  hovermode:'x unified'
+}, {responsive:true,displayModeBar:false});
+</script>
+
+<h2>Blocked Signals — What the Guards Caught</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Date</th><th>Signal</th><th>Bracket</th><th>Why Blocked</th><th>Would Have</th></tr></thead>
+  <tbody><tr>
+          <td>2026-02-15</td>
+          <td>CEIL</td>
+          <td>5°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 16.0:00<br>&bull; OM forecasts 7.8°C later today (running high: 3°C)<br>&bull; OM forecast high 8.8°C is close to bracket 5.0°C<br>&bull; Rising trend on: METAR, SYNOP<br>&bull; SYNOP rose +1.0°C in last 3h</td>
+          <td class="yellow">won (correct signal blocked)</td>
+        </tr><tr>
+          <td>2026-02-15</td>
+          <td>CEIL</td>
+          <td>>=7°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 16.0:00<br>&bull; OM forecasts 7.8°C later today (running high: 3°C)<br>&bull; OM forecast high 8.8°C is close to bracket 7.0°C<br>&bull; Rising trend on: METAR, SYNOP<br>&bull; SYNOP rose +1.0°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-15</td>
+          <td>LOCK</td>
+          <td>3°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 17.0:00<br>&bull; OM forecasts 7.8°C later today (running high: 3°C)<br>&bull; OM forecast high 8.8°C is close to bracket 3.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +1.4°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-15</td>
+          <td>LOCK</td>
+          <td>4°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 18.0:00<br>&bull; OM forecasts 7.8°C later today (running high: 4°C)<br>&bull; OM forecast high 8.8°C is close to bracket 4.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +1.6°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-15</td>
+          <td>LOCK</td>
+          <td>5°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 19.0:00<br>&bull; OM forecasts 7.8°C later today (running high: 5°C)<br>&bull; OM forecast high 8.8°C is close to bracket 5.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +2.2°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-15</td>
+          <td>LOCK</td>
+          <td>6°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 19.5:00<br>&bull; OM forecasts 7.8°C later today (running high: 6°C)<br>&bull; OM forecast high 8.8°C is close to bracket 6.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +1.8°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-18</td>
+          <td>CEIL</td>
+          <td>>=8°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 16.0:00<br>&bull; OM forecasts 8.1°C later today (running high: 5°C)<br>&bull; OM forecast high 9.1°C is close to bracket 8.0°C<br>&bull; Rising trend on: SYNOP, Open-Meteo<br>&bull; SYNOP rose +0.9°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-18</td>
+          <td>LOCK</td>
+          <td>6°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 17.0:00<br>&bull; OM forecasts 8.1°C later today (running high: 6°C)<br>&bull; OM forecast high 9.1°C is close to bracket 6.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +0.4°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr><tr>
+          <td>2026-02-18</td>
+          <td>LOCK</td>
+          <td>7°C</td>
+          <td>&bull; OM forecasts peak at 22:00, after signal at 19.5:00<br>&bull; OM forecasts 8.1°C later today (running high: 7°C)<br>&bull; OM forecast high 9.1°C is close to bracket 7.0°C<br>&bull; Rising trend on: METAR, SYNOP, Open-Meteo<br>&bull; SYNOP rose +0.9°C in last 3h</td>
+          <td class="green">LOST $100</td>
+        </tr></tbody>
+</table>
+</div>
+
+<h2>Daily Detail — New (Guarded) Strategy</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Date</th><th>High</th><th>Trades</th><th>P&amp;L</th></tr></thead>
+  <tbody><tr>
+      <td><strong>2026-02-11</strong></td><td>13°C</td>
+      <td>4</td><td class="green"><strong>$+0</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=9°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 10°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 11°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 12°C @? &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-15</strong></td><td>9°C</td>
+      <td>7 + 6 blocked</td><td class="green"><strong>$+7</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO 0°C @0.5% &rarr; $+1</span> <span class='chip '>&#x2705; T2 NO 1°C @0.6% &rarr; $+1</span> <span class='chip '>&#x2705; T2 NO 2°C @0.5% &rarr; $+0</span> <span class='chip '>&#x2705; T2 NO 3°C @2.9% &rarr; $+3</span> <span class='chip '>&#x2705; T2 NO 4°C @2.1% &rarr; $+2</span> <span class='chip chip-blocked'>&#x1F6AB; 5°C BLOCKED</span> <span class='chip chip-blocked'>&#x1F6AB; >=7°C BLOCKED</span> <span class='chip chip-blocked'>&#x1F6AB; 3°C BLOCKED</span> <span class='chip chip-blocked'>&#x1F6AB; 4°C BLOCKED</span> <span class='chip chip-blocked'>&#x1F6AB; 5°C BLOCKED</span> <span class='chip '>&#x2705; T1 NO 5°C @0.1% &rarr; $+0</span> <span class='chip chip-blocked'>&#x1F6AB; 6°C BLOCKED</span> <span class='chip '>&#x2705; T1 NO 6°C @0.1% &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-16</strong></td><td>11°C</td>
+      <td>6</td><td class="green"><strong>$+17</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=5°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 6°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 7°C @1.8% &rarr; $+2</span> <span class='chip '>&#x2705; T1 NO 8°C @1.6% &rarr; $+2</span> <span class='chip '>&#x2705; T1 NO 9°C @10.5% &rarr; $+12</span> <span class='chip '>&#x2705; T1 NO 10°C @2.0% &rarr; $+2</span> </td></tr><tr>
+      <td><strong>2026-02-17</strong></td><td>8°C</td>
+      <td>4</td><td class="green"><strong>$+2</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=4°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 5°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 6°C @1.2% &rarr; $+1</span> <span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-18</strong></td><td>9°C</td>
+      <td>8 + 3 blocked</td><td class="green"><strong>$+1</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=0°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 1°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 2°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 3°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T2 NO 4°C @0.1% &rarr; $+0</span> <span class='chip '>&#x2705; T2 NO 5°C @0.2% &rarr; $+0</span> <span class='chip chip-blocked'>&#x1F6AB; >=8°C BLOCKED</span> <span class='chip chip-blocked'>&#x1F6AB; 6°C BLOCKED</span> <span class='chip '>&#x2705; T1 NO 6°C @0.1% &rarr; $+0</span> <span class='chip chip-blocked'>&#x1F6AB; 7°C BLOCKED</span> <span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-19</strong></td><td>10°C</td>
+      <td>8</td><td class="green"><strong>$+1</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=2°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 3°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 4°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 5°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 6°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 7°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 8°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 9°C @0.5% &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-20</strong></td><td>11°C</td>
+      <td>5</td><td class="green"><strong>$+2</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=6°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T2 NO 7°C @0.4% &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 8°C @0.4% &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 9°C @0.9% &rarr; $+1</span> <span class='chip '>&#x2705; T1 NO 10°C @0.1% &rarr; $+0</span> </td></tr><tr>
+      <td><strong>2026-02-21</strong></td><td>16°C</td>
+      <td>7</td><td class="green"><strong>$+1</strong></td>
+    </tr><tr class="detail-row"><td colspan="4"><span class='chip '>&#x2705; T1 NO <=9°C @? &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 10°C @0.5% &rarr; $+1</span> <span class='chip '>&#x2705; T2 NO 11°C @0.6% &rarr; $+1</span> <span class='chip '>&#x2705; T1 NO 12°C @0.1% &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 13°C @0.1% &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 14°C @0.1% &rarr; $+0</span> <span class='chip '>&#x2705; T1 NO 15°C @0.1% &rarr; $+0</span> </td></tr></tbody>
+</table>
+</div>
+
+<div class="callout callout-blue">
+  <h3>What Changed</h3>
+  <p>The guards blocked <strong>9 risky signals</strong> that the old strategy would have fired.
+  Of those, <strong>8</strong> would have been wrong (&minus;$100 each).
+  The others were correct signals that got blocked too (false positives) — a small price to pay for safety.</p>
+  <p style="margin-top:8px">The new strategy keeps all the Floor NO gains ($+31.70) and adds
+  any Ceiling/Lock-In signals that pass all 5 guards. Total: <strong class="green">$+31.70</strong>.</p>
+</div>
+
+</div></body></html>

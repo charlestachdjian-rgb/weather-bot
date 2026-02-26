@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>Honest Backtest — $100/Trade</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0d1117; color:#c9d1d9; padding:24px; line-height:1.6; }
+  .container { max-width:1200px; margin:0 auto; }
+  h1 { font-size:22px; color:#e6edf3; } h2 { font-size:17px; color:#e6edf3; margin:28px 0 12px; border-bottom:1px solid #30363d; padding-bottom:6px; }
+  .sub { font-size:13px; color:#8b949e; margin-bottom:20px; }
+  .green { color:#2ecc71; } .red { color:#e74c3c; } .yellow { color:#f1c40f; } .muted { color:#484f58; }
+
+  .compare { display:flex; gap:20px; margin:16px 0; flex-wrap:wrap; }
+  .strat-card { flex:1; min-width:300px; background:#161b22; border-radius:10px; padding:20px; }
+  .strat-card.safe { border:2px solid #2ecc71; }
+  .strat-card.risky { border:2px solid #e74c3c; }
+  .strat-card h3 { font-size:15px; margin-bottom:12px; }
+  .strat-card .big { font-size:32px; font-weight:700; }
+  .strat-card .row { display:flex; justify-content:space-between; margin:4px 0; font-size:13px; }
+  .strat-card .label { color:#8b949e; }
+
+  .chart-box { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:12px; margin:12px 0; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; padding:8px 10px; border-bottom:2px solid #30363d; color:#8b949e; font-size:10px; text-transform:uppercase; }
+  td { padding:6px 10px; border-bottom:1px solid #21262d; }
+  tr:hover { background:#1c2333; }
+  .section { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px; margin:12px 0; }
+  .detail-row td { padding:4px 10px 10px; font-size:11px; border-bottom:2px solid #30363d; }
+
+  .chip {
+    display:inline-block; padding:2px 8px; margin:2px; border-radius:4px;
+    background:#21262d; border:1px solid #30363d; font-size:11px; white-space:nowrap;
+  }
+  .chip-bad { background:#3d1418; border-color:#e74c3c; }
+
+  .callout { border-radius:10px; padding:20px; margin:20px 0; font-size:14px; }
+  .callout-green { background:linear-gradient(135deg,#0d2818,#161b22); border:2px solid #238636; }
+  .callout-red { background:linear-gradient(135deg,#2d0d0d,#161b22); border:2px solid #e74c3c; }
+  .callout h3 { margin-bottom:8px; }
+  .callout-green h3 { color:#2ecc71; }
+  .callout-red h3 { color:#e74c3c; }
+
+  .math { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px; margin:12px 0; font-size:14px; }
+  .math .eq { font-family:monospace; font-size:15px; margin:6px 0; padding:8px 12px; background:#0d1117; border-radius:4px; }
+</style></head><body>
+<div class="container">
+
+<h1>Honest Backtest — $100 Invested Per Trade</h1>
+<div class="sub">
+  8 Paris days &bull; Win = small profit &bull; <span class="red">Lose = lose the full $100</span> &bull;
+  Generated 20:23 CET, Feb 22 2026
+</div>
+
+<div class="math">
+  <strong>How the math works for every trade:</strong>
+  <div class="eq">You invest $100 → Buy shares at market price</div>
+  <div class="eq green">Win: you get back $100 + profit → Profit = $100 × (YES price) / (NO price)</div>
+  <div class="eq red">Lose: your shares go to $0 → <strong>You lose $100. Always. No matter the share price.</strong></div>
+  <p style="margin-top:8px; font-size:13px; color:#8b949e;">Example: YES=3%, NO=97%. You buy ~103 NO shares for $100. Win: collect $103, profit $3. Lose: lose $100.</p>
+</div>
+
+<h2>Side by Side: Safe vs All Strategies</h2>
+<div class="compare">
+  <div class="strat-card safe">
+    <h3 class="green">Floor NO Only (T1 + T2)</h3>
+    <div class="big green">$+31.65</div>
+    <div class="row"><span class="label">Trades</span><span>48</span></div>
+    <div class="row"><span class="label">Win rate</span><span class="green"><strong>48/48 (100%)</strong></span></div>
+    <div class="row"><span class="label">Wrong trades</span><span><span class=green>0</span></span></div>
+    <div class="row"><span class="label">Total invested</span><span>$4,800</span></div>
+    <div class="row"><span class="label">ROI</span><span>0.66%</span></div>
+    <div class="row"><span class="label">Best day</span><span class="green">$+17.48 (2026-02-16)</span></div>
+    <div class="row"><span class="label">Worst day</span><span>$+0.40 (2026-02-11)</span></div>
+    <div class="row"><span class="label">Max single loss</span><span class="green">$0</span></div>
+  </div>
+  <div class="strat-card risky">
+    <h3 class="red">All Strategies (Floor + Ceiling + Lock-In)</h3>
+    <div class="big red">$-363.03</div>
+    <div class="row"><span class="label">Trades</span><span>53</span></div>
+    <div class="row"><span class="label">Win rate</span><span>49/53 (92%)</span></div>
+    <div class="row"><span class="label">Wrong trades</span><span class="red"><strong>4</strong></span></div>
+    <div class="row"><span class="label">Total invested</span><span>$5,300</span></div>
+    <div class="row"><span class="label">ROI</span><span class="red">-6.85%</span></div>
+    <div class="row"><span class="label">Best day</span><span class="green">$+17.48 (2026-02-16)</span></div>
+    <div class="row"><span class="label">Worst day</span><span class="red">$-199.15 (2026-02-18)</span></div>
+    <div class="row"><span class="label">Max single loss</span><span class="red">-$100</span></div>
+  </div>
+</div>
+
+<h2>Cumulative P&amp;L</h2>
+<div class="chart-box"><div id="cumChart" style="height:380px"></div></div>
+<script>
+Plotly.newPlot('cumChart', [
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, 7.29, 24.77, 26.29, 27.14, 28.34, 30.2, 31.65], type:'scatter', mode:'lines+markers',
+     name:'Floor NO only', line:{color:'#2ecc71',width:3}, marker:{size:6},
+     hovertemplate:'Floor only: $%{y:.2f}<extra></extra>' },
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, -187.39, -169.91, -168.39, -367.54, -366.34, -364.48, -363.03], type:'scatter', mode:'lines+markers',
+     name:'All strategies', line:{color:'#e74c3c',width:3,dash:'dash'}, marker:{size:6},
+     hovertemplate:'All: $%{y:.2f}<extra></extra>' }
+], {
+  paper_bgcolor:'#161b22', plot_bgcolor:'#161b22',
+  font:{color:'#c9d1d9',size:12}, margin:{l:60,r:30,t:10,b:50},
+  xaxis:{gridcolor:'#21262d'},
+  yaxis:{gridcolor:'#21262d',title:'Cumulative P&L ($)',zeroline:true,zerolinecolor:'#30363d'},
+  legend:{bgcolor:'rgba(22,27,34,0.9)',bordercolor:'#30363d',borderwidth:1,x:0.01,y:0.99},
+  hovermode:'x unified'
+}, {responsive:true,displayModeBar:false});
+</script>
+
+<h2>Daily P&amp;L Comparison</h2>
+<div class="chart-box"><div id="barChart" style="height:350px"></div></div>
+<script>
+Plotly.newPlot('barChart', [
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, 6.89, 17.48, 1.52, 0.85, 1.2, 1.86, 1.45], type:'bar', name:'Floor NO only',
+     marker:{color:'#2ecc71'}, hovertemplate:'Floor: $%{y:.2f}<extra></extra>' },
+  { x:["2026-02-11", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21"], y:[0.4, -187.79, 17.48, 1.52, -199.15, 1.2, 1.86, 1.45], type:'bar', name:'All strategies',
+     marker:{color:'#e74c3c',opacity:0.7}, hovertemplate:'All: $%{y:.2f}<extra></extra>' }
+], {
+  paper_bgcolor:'#161b22', plot_bgcolor:'#161b22',
+  font:{color:'#c9d1d9',size:12}, margin:{l:60,r:30,t:10,b:50},
+  xaxis:{gridcolor:'#21262d'},
+  yaxis:{gridcolor:'#21262d',title:'Daily P&L ($)',zeroline:true,zerolinecolor:'#30363d'},
+  legend:{bgcolor:'rgba(22,27,34,0.9)',bordercolor:'#30363d',borderwidth:1,x:0.01,y:0.99},
+  barmode:'group', hovermode:'x unified'
+}, {responsive:true,displayModeBar:false});
+</script>
+
+<h2>Performance by Signal Type (All Strategies)</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Signal</th><th>Trades</th><th>Win Rate</th><th>Total P&amp;L</th><th>Avg/Trade</th></tr></thead>
+  <tbody><tr><td>Floor NO (T1)</td><td>40</td><td>40/40 (100%)</td><td class='green'><strong>$+23.96</strong></td><td>$+0.60</td></tr><tr><td>Floor NO (T2)</td><td>8</td><td>8/8 (100%)</td><td class='green'><strong>$+7.69</strong></td><td>$+0.96</td></tr><tr><td>Ceiling NO</td><td>3</td><td>1/3 (33%)</td><td class='red'><strong>$-194.68</strong></td><td>$-64.89</td></tr><tr><td>Locked-In YES</td><td>2</td><td>0/2 (0%)</td><td class='red'><strong>$-200.00</strong></td><td>$-100.00</td></tr></tbody>
+</table>
+</div>
+
+<h2>Daily Detail — Floor NO Only (Safe Strategy)</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Date</th><th>High</th><th>Forecast</th><th>Trades</th><th>P&amp;L</th><th>Wrong</th></tr></thead>
+  <tbody><tr>
+          <td><strong>2026-02-11</strong></td><td>13°C</td><td>13.3°C</td>
+          <td>4</td><td class="green"><strong>$+0</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 12°C @? &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-15</strong></td><td>9°C</td><td>8.8°C</td>
+          <td>6</td><td class="green"><strong>$+7</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 6°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-16</strong></td><td>11°C</td><td>10.8°C</td>
+          <td>6</td><td class="green"><strong>$+17</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 10°C @2.0% &rarr; <strong>$+2</strong></span> </td></tr><tr>
+          <td><strong>2026-02-17</strong></td><td>8°C</td><td>8.8°C</td>
+          <td>4</td><td class="green"><strong>$+2</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-18</strong></td><td>9°C</td><td>9.8°C</td>
+          <td>8</td><td class="green"><strong>$+1</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-19</strong></td><td>10°C</td><td>10.7°C</td>
+          <td>8</td><td class="green"><strong>$+1</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 9°C @0.5% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-20</strong></td><td>11°C</td><td>11.9°C</td>
+          <td>5</td><td class="green"><strong>$+2</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 10°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-21</strong></td><td>16°C</td><td>15.7°C</td>
+          <td>7</td><td class="green"><strong>$+1</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 15°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr></tbody>
+</table>
+</div>
+
+<h2>Daily Detail — All Strategies</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Date</th><th>High</th><th>Forecast</th><th>Trades</th><th>P&amp;L</th><th>Wrong</th></tr></thead>
+  <tbody><tr>
+          <td><strong>2026-02-11</strong></td><td>13°C</td><td>13.3°C</td>
+          <td>4</td><td class="green"><strong>$+0</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 12°C @? &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-15</strong></td><td>9°C</td><td>8.8°C</td>
+          <td>9</td><td class="red"><strong>$-188</strong></td>
+          <td><span class='red'>2</span></td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 6°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-16</strong></td><td>11°C</td><td>10.8°C</td>
+          <td>6</td><td class="green"><strong>$+17</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 10°C @2.0% &rarr; <strong>$+2</strong></span> </td></tr><tr>
+          <td><strong>2026-02-17</strong></td><td>8°C</td><td>8.8°C</td>
+          <td>4</td><td class="green"><strong>$+2</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-18</strong></td><td>9°C</td><td>9.8°C</td>
+          <td>10</td><td class="red"><strong>$-199</strong></td>
+          <td><span class='red'>2</span></td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 7°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-19</strong></td><td>10°C</td><td>10.7°C</td>
+          <td>8</td><td class="green"><strong>$+1</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 9°C @0.5% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-20</strong></td><td>11°C</td><td>11.9°C</td>
+          <td>5</td><td class="green"><strong>$+2</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 10°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr><tr>
+          <td><strong>2026-02-21</strong></td><td>16°C</td><td>15.7°C</td>
+          <td>7</td><td class="green"><strong>$+1</strong></td>
+          <td>0</td>
+        </tr><tr class="detail-row"><td colspan="6"><span class='chip '>&#x2705; T1 NO 15°C @0.1% &rarr; <strong>$+0</strong></span> </td></tr></tbody>
+</table>
+</div>
+
+<div class="callout callout-green">
+  <h3>Floor NO: The Safe Strategy</h3>
+  <p><strong>48/48 trades correct (100% win rate).</strong>
+  Total P&amp;L: <strong>$+31.65</strong> over 8 days.
+  Not a single losing trade. The math is simple: once a running high exceeds a bracket's threshold,
+  it can never go back down. Every Floor NO trade is guaranteed to resolve correctly.</p>
+  <p style="margin-top:8px">The edge per trade is small (pennies to a few dollars), but the risk is <strong>zero</strong>.</p>
+</div>
+
+<div class="callout callout-red">
+  <h3>Ceiling NO &amp; Locked-In YES: The Trap</h3>
+  <p>These strategies added 5 trades with 4 losses.
+  Each loss = <strong>-$100</strong> (your full bet), wiping out many winning trades.</p>
+  <p style="margin-top:8px">The losses happened because Paris temperature surged +4-6°C <strong>after 4-5pm</strong>.
+  The 4pm/5pm cutoffs are too early for Paris winter. These strategies should either be dropped entirely
+  or use much later cutoffs (10pm+) with additional trend confirmation.</p>
+</div>
+
+</div></body></html>

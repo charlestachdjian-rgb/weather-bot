@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Paris CDG Temperature — 2026-02-22</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .header {
+    max-width: 1100px;
+    margin: 0 auto 16px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #e6edf3;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: #8b949e;
+    margin-top: 4px;
+  }
+  .stats {
+    display: flex;
+    gap: 24px;
+    margin: 16px auto;
+    max-width: 1100px;
+  }
+  .stat-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 14px 20px;
+    flex: 1;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8b949e;
+  }
+  .stat-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .stat-card .detail {
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 2px;
+  }
+  .metar-val { color: #e74c3c; }
+  .synop-val { color: #2ecc71; }
+  .om-val { color: #3498db; }
+  #chart {
+    max-width: 1100px;
+    height: 500px;
+    margin: 0 auto;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .footer {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    font-size: 11px;
+    color: #484f58;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Paris CDG (LFPG) — Temperature Tracker</h1>
+  <div class="subtitle">
+    2026-02-22 &middot; Polymarket resolution source: Weather Underground / LFPG
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="label">METAR (Primary)</div>
+    <div class="value metar-val">14°C</div>
+    <div class="detail">1°C precision &middot; 32 readings today</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">SYNOP (Secondary)</div>
+    <div class="value synop-val">14.1°C</div>
+    <div class="detail">0.1°C precision &middot; Same CDG sensors</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Open-Meteo (Tertiary)</div>
+    <div class="value om-val">13.0°C</div>
+    <div class="detail">0.1°C model data &middot; Trend indicator</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Daily High</div>
+    <div class="value" style="color:#f0c040">14.1°C</div>
+    <div class="detail">From SYNOP (most precise station data)</div>
+  </div>
+</div>
+
+<div id="chart"></div>
+
+<div class="footer">
+  Generated 2026-02-22 15:43 CET &middot;
+  METAR = aviationweather.gov &middot;
+  SYNOP = OGIMET (station 07157) &middot;
+  Open-Meteo = model interpolation
+</div>
+
+<script>
+const traces = [
+  {
+            x: ['2026-02-22T00:00:00+01:00', '2026-02-22T00:30:00+01:00', '2026-02-22T01:00:00+01:00', '2026-02-22T01:30:00+01:00', '2026-02-22T02:00:00+01:00', '2026-02-22T02:30:00+01:00', '2026-02-22T03:00:00+01:00', '2026-02-22T03:30:00+01:00', '2026-02-22T04:00:00+01:00', '2026-02-22T04:30:00+01:00', '2026-02-22T05:00:00+01:00', '2026-02-22T05:30:00+01:00', '2026-02-22T06:00:00+01:00', '2026-02-22T06:30:00+01:00', '2026-02-22T07:00:00+01:00', '2026-02-22T07:30:00+01:00', '2026-02-22T08:00:00+01:00', '2026-02-22T08:30:00+01:00', '2026-02-22T09:00:00+01:00', '2026-02-22T09:30:00+01:00', '2026-02-22T10:00:00+01:00', '2026-02-22T10:30:00+01:00', '2026-02-22T11:00:00+01:00', '2026-02-22T11:30:00+01:00', '2026-02-22T12:00:00+01:00', '2026-02-22T12:30:00+01:00', '2026-02-22T13:00:00+01:00', '2026-02-22T13:30:00+01:00', '2026-02-22T14:00:00+01:00', '2026-02-22T14:30:00+01:00', '2026-02-22T15:00:00+01:00', '2026-02-22T15:30:00+01:00'],
+            y: [13.0, 12.0, 12.0, 13.0, 13.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'METAR (1°C, primary)',
+            line: {color: '#e74c3c', width: 2.5, dash: false},
+            marker: {size: 5},
+            hovertemplate: '%{y:.1f}°C<br>%{x|%H:%M}<extra>METAR (1°C, primary)</extra>'
+        },
+  {
+            x: ['2026-02-22T01:00:00+01:00', '2026-02-22T02:00:00+01:00', '2026-02-22T03:00:00+01:00', '2026-02-22T04:00:00+01:00', '2026-02-22T05:00:00+01:00', '2026-02-22T06:00:00+01:00', '2026-02-22T07:00:00+01:00', '2026-02-22T08:00:00+01:00', '2026-02-22T09:00:00+01:00', '2026-02-22T10:00:00+01:00', '2026-02-22T11:00:00+01:00', '2026-02-22T12:00:00+01:00', '2026-02-22T13:00:00+01:00', '2026-02-22T14:00:00+01:00', '2026-02-22T15:00:00+01:00'],
+            y: [12.4, 12.4, 12.3, 12.2, 12.2, 12.1, 11.9, 11.8, 12.0, 12.5, 12.8, 13.3, 13.6, 13.8, 14.1],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'SYNOP (0.1°C, same station)',
+            line: {color: '#2ecc71', width: 2.5, dash: false},
+            marker: {size: 5},
+            hovertemplate: '%{y:.1f}°C<br>%{x|%H:%M}<extra>SYNOP (0.1°C, same station)</extra>'
+        },
+  {
+            x: ['2026-02-22T00:00:00+01:00', '2026-02-22T00:15:00+01:00', '2026-02-22T00:30:00+01:00', '2026-02-22T00:45:00+01:00', '2026-02-22T01:00:00+01:00', '2026-02-22T01:15:00+01:00', '2026-02-22T01:30:00+01:00', '2026-02-22T01:45:00+01:00', '2026-02-22T02:00:00+01:00', '2026-02-22T02:15:00+01:00', '2026-02-22T02:30:00+01:00', '2026-02-22T02:45:00+01:00', '2026-02-22T03:00:00+01:00', '2026-02-22T03:15:00+01:00', '2026-02-22T03:30:00+01:00', '2026-02-22T03:45:00+01:00', '2026-02-22T04:00:00+01:00', '2026-02-22T04:15:00+01:00', '2026-02-22T04:30:00+01:00', '2026-02-22T04:45:00+01:00', '2026-02-22T05:00:00+01:00', '2026-02-22T05:15:00+01:00', '2026-02-22T05:30:00+01:00', '2026-02-22T05:45:00+01:00', '2026-02-22T06:00:00+01:00', '2026-02-22T06:15:00+01:00', '2026-02-22T06:30:00+01:00', '2026-02-22T06:45:00+01:00', '2026-02-22T07:00:00+01:00', '2026-02-22T07:15:00+01:00', '2026-02-22T07:30:00+01:00', '2026-02-22T07:45:00+01:00', '2026-02-22T08:00:00+01:00', '2026-02-22T08:15:00+01:00', '2026-02-22T08:30:00+01:00', '2026-02-22T08:45:00+01:00', '2026-02-22T09:00:00+01:00', '2026-02-22T09:15:00+01:00', '2026-02-22T09:30:00+01:00', '2026-02-22T09:45:00+01:00', '2026-02-22T10:00:00+01:00', '2026-02-22T10:15:00+01:00', '2026-02-22T10:30:00+01:00', '2026-02-22T10:45:00+01:00', '2026-02-22T11:00:00+01:00', '2026-02-22T11:15:00+01:00', '2026-02-22T11:30:00+01:00', '2026-02-22T11:45:00+01:00', '2026-02-22T12:00:00+01:00', '2026-02-22T12:15:00+01:00', '2026-02-22T12:30:00+01:00', '2026-02-22T12:45:00+01:00', '2026-02-22T13:00:00+01:00', '2026-02-22T13:15:00+01:00', '2026-02-22T13:30:00+01:00', '2026-02-22T13:45:00+01:00', '2026-02-22T14:00:00+01:00', '2026-02-22T14:15:00+01:00', '2026-02-22T14:30:00+01:00', '2026-02-22T14:45:00+01:00', '2026-02-22T15:00:00+01:00', '2026-02-22T15:15:00+01:00'],
+            y: [12.4, 12.4, 12.3, 12.2, 12.1, 12.0, 12.0, 11.9, 11.9, 11.9, 11.9, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 11.9, 11.9, 11.8, 11.8, 11.8, 11.7, 11.7, 11.6, 11.6, 11.6, 11.6, 11.5, 11.5, 11.5, 11.5, 11.6, 11.6, 11.7, 11.8, 11.9, 12.0, 12.1, 12.2, 12.3, 12.3, 12.4, 12.5, 12.6, 12.6, 12.7, 12.9, 13.0, 13.2, 13.3, 13.3, 13.4, 13.4, 13.4, 13.3, 13.3, 13.2, 13.1, 13.0],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Open-Meteo (0.1°C, model)',
+            line: {color: '#3498db', width: 2.5, dash: 'dot'},
+            marker: {size: 5},
+            hovertemplate: '%{y:.1f}°C<br>%{x|%H:%M}<extra>Open-Meteo (0.1°C, model)</extra>'
+        }
+];
+
+const layout = {
+  paper_bgcolor: '#161b22',
+  plot_bgcolor: '#161b22',
+  font: { color: '#c9d1d9', family: 'Segoe UI, system-ui, sans-serif', size: 12 },
+  height: 480,
+  margin: { l: 55, r: 30, t: 30, b: 50 },
+  xaxis: {
+    type: 'date',
+    gridcolor: '#21262d',
+    tickformat: '%H:%M',
+    title: { text: 'Time (CET)', standoff: 10 },
+  },
+  yaxis: {
+    gridcolor: '#21262d',
+    title: { text: 'Temperature (°C)', standoff: 10 },
+    range: [10.5, 15.1],
+    dtick: 1,
+  },
+  legend: {
+    bgcolor: 'rgba(22,27,34,0.9)',
+    bordercolor: '#30363d',
+    borderwidth: 1,
+    font: { size: 11 },
+    x: 0.01, y: 0.99,
+  },
+  shapes: [{
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 10, y1: 10,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 11, y1: 11,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 12, y1: 12,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 13, y1: 13,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 14, y1: 14,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 15, y1: 15,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }, {
+            type: 'line', xref: 'paper', x0: 0, x1: 1,
+            y0: 16, y1: 16,
+            line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'}
+        }],
+  hovermode: 'x unified',
+};
+
+Plotly.newPlot('chart', traces, layout, {
+  responsive: true,
+  displayModeBar: true,
+  modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+});
+</script>
+</body>
+</html>

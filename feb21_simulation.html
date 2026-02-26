@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Strategy Simulation — February 21, 2026</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #e6edf3; } h2 { font-size: 17px; color: #e6edf3; margin: 28px 0 12px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 20px; }
+  .green { color: #2ecc71; } .red { color: #e74c3c; } .yellow { color: #f1c40f; } .muted { color: #484f58; }
+  .winner { color: #58a6ff; font-weight: 600; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 140px; }
+  .kpi .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e; }
+  .kpi .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .kpi .detail { font-size: 11px; color: #8b949e; margin-top: 2px; }
+
+  .chart-container { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; margin: 12px 0; }
+  #tempChart { height: 420px; }
+  #priceChart { height: 350px; }
+
+  .event { display: flex; gap: 16px; margin: 8px 0; padding: 14px 18px; border-radius: 8px; }
+  .event-t1 { background: #0d2818; border: 1px solid #238636; }
+  .event-t2 { background: #2d2200; border: 1px solid #d29922; }
+  .event-ceil { background: #2d0d0d; border: 1px solid #e74c3c; }
+  .event-lock { background: #0d1b2d; border: 1px solid #58a6ff; }
+  .event-time { font-size: 15px; font-weight: 700; color: #e6edf3; min-width: 60px; text-align: center; padding-top: 2px; }
+  .event-body { flex: 1; }
+  .event-tier { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .event-action { font-size: 15px; color: #e6edf3; }
+  .event-detail { font-size: 12px; color: #8b949e; margin-top: 4px; }
+  .event-pnl { font-size: 13px; margin-top: 6px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #30363d; color: #8b949e; font-size: 10px; text-transform: uppercase; }
+  td { padding: 6px 10px; border-bottom: 1px solid #21262d; }
+  tr:hover { background: #1c2333; }
+  .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin: 12px 0; }
+
+  .legend { display: flex; gap: 20px; font-size: 12px; margin: 8px 0; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-t1 { background: #2ecc71; } .dot-t2 { background: #f1c40f; }
+  .dot-ceil { background: #e74c3c; } .dot-lock { background: #58a6ff; }
+
+  .verdict { background: linear-gradient(135deg, #0d2818, #161b22); border: 2px solid #238636; border-radius: 10px; padding: 20px; margin: 20px 0; }
+  .verdict h3 { color: #2ecc71; font-size: 16px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Strategy 1 Replay &mdash; February 21, 2026</h1>
+<div class="subtitle">
+  Historical simulation of two-tier bracket-killing at Paris CDG (LFPG) &bull;
+  This day had the widest temperature swing in our dataset
+</div>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">WU Daily High</div>
+    <div class="value red">16&deg;C</div>
+    <div class="detail">Resolution source (48 obs)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">SYNOP High</div>
+    <div class="value green">15.4&deg;C</div>
+    <div class="detail">0.1°C precision</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Forecast High</div>
+    <div class="value yellow">15.7&deg;C</div>
+    <div class="detail">Open-Meteo 14.7&deg;C + 1.0&deg;C bias</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Signals Fired</div>
+    <div class="value">7</div>
+    <div class="detail">6 Floor T1 + 1 Floor T2 + 0 Ceil + 0 Lock</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Actionable</div>
+    <div class="value">6</div>
+    <div class="detail">Had YES &gt; 0% at signal time</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Profit</div>
+    <div class="value green">$1.5</div>
+    <div class="detail">Per $100/trade</div>
+  </div>
+</div>
+
+<h2>Temperature Timeline</h2>
+<div class="chart-container"><div id="tempChart"></div></div>
+<script>
+const tempTraces = [
+  {
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 16, 15, 16, 15, 15, 15, 15, 14, 13, 12, 12, 12, 12, 12, 13, 12, 13, 13, 13],
+    type: 'scatter', mode: 'lines+markers', name: 'METAR/WU (1&deg;C)',
+    line: {color: '#e74c3c', width: 2}, marker: {size: 4},
+    hovertemplate: 'METAR: %{y}&deg;C<br>%{x}<extra></extra>'
+  },
+  {
+    x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "01:00"], y: [10.5, 10.6, 10.4, 10.6, 10.2, 10.6, 10.7, 10.8, 11.1, 11.7, 12.0, 13.0, 14.3, 14.7, 15.4, 15.3, 14.9, 14.2, 12.4, 12.0, 12.4, 12.4, 12.7, 12.4],
+    type: 'scatter', mode: 'lines+markers', name: 'SYNOP (0.1&deg;C)',
+    line: {color: '#2ecc71', width: 2}, marker: {size: 4},
+    hovertemplate: 'SYNOP: %{y:.1f}&deg;C<br>%{x}<extra></extra>'
+  },
+  {
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+    type: 'scatter', mode: 'lines', name: 'Running High',
+    line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+    hovertemplate: 'Running High: %{y}&deg;C<br>%{x}<extra></extra>'
+  },
+  {
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: Array(48).fill(15.7),
+    type: 'scatter', mode: 'lines', name: 'Forecast High (15.7&deg;C)',
+    line: {color: '#f1c40f', width: 1.5, dash: 'dashdot'},
+    hovertemplate: 'Forecast: 15.7&deg;C<extra></extra>'
+  }
+];
+
+const brackets = [{"label": "<=9\u00b0C", "hi": 9.0}, {"label": "10\u00b0C", "hi": 10.0}, {"label": "11\u00b0C", "hi": 11.0}, {"label": "12\u00b0C", "hi": 12.0}, {"label": "13\u00b0C", "hi": 13.0}, {"label": "14\u00b0C", "hi": 14.0}, {"label": "15\u00b0C", "hi": 15.0}, {"label": "16\u00b0C", "hi": 16.0}];
+brackets.forEach((b, i) => {
+  const kill = b.hi + 0.5;
+  tempTraces.push({
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: Array(48).fill(kill),
+    type: 'scatter', mode: 'lines', name: b.label + ' kill',
+    line: {color: 'rgba(150,150,150,0.3)', width: 1, dash: 'dot'},
+    showlegend: false,
+    hovertemplate: b.label + ' dead at %{y}&deg;C<extra></extra>'
+  });
+});
+
+Plotly.newPlot('tempChart', tempTraces, {
+  paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+  font: { color: '#c9d1d9', size: 12 },
+  margin: { l: 50, r: 30, t: 10, b: 50 },
+  height: 400,
+  xaxis: { gridcolor: '#21262d', title: 'Time (CET)' },
+  yaxis: { gridcolor: '#21262d', title: 'Temperature (&deg;C)', dtick: 1 },
+  legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: { size: 10 }, x: 0.01, y: 0.99 },
+  hovermode: 'x unified',
+  annotations: [{
+        x: '00:00', y: 10,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> <=9°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -35
+    },{
+        x: '01:00', y: 11,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> 10°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -70
+    },{
+        x: '09:00', y: 15.7,
+        xref: 'x', yref: 'y',
+        text: '<b>T2</b> 11°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#f1c40f',
+        font: { color: '#f1c40f', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#f1c40f',
+        ax: 30, ay: -105
+    },{
+        x: '11:30', y: 13,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> 12°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -140
+    },{
+        x: '12:30', y: 14,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> 13°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -30
+    },{
+        x: '13:30', y: 15,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> 14°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -65
+    },{
+        x: '14:30', y: 16,
+        xref: 'x', yref: 'y',
+        text: '<b>T1</b> 15°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.85)', bordercolor: '#2ecc71',
+        ax: 30, ay: -100
+    }]
+}, { responsive: true, displayModeBar: false });
+</script>
+
+<h2>Market Prices Throughout the Day</h2>
+<div class="chart-container"><div id="priceChart"></div></div>
+<script>
+const priceTraces = [{
+        x: ["01:00", "02:00"], y: [0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '<=9°C',
+        line: {color: '#e74c3c', width: 2},
+        hovertemplate: '<=9°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00"], y: [0.5, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '10°C',
+        line: {color: '#e67e22', width: 2},
+        hovertemplate: '10°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00"], y: [1.1, 0.9, 0.7, 0.7, 0.7, 0.7, 0.7, 0.4, 0.6, 0.9, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '11°C',
+        line: {color: '#f1c40f', width: 2},
+        hovertemplate: '11°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00"], y: [2.1, 1.6, 1.6, 1.5, 1.5, 1.6, 1.0, 1.0, 1.0, 0.9, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '12°C',
+        line: {color: '#2ecc71', width: 2},
+        hovertemplate: '12°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"], y: [34.5, 31.5, 31.0, 27.5, 20.0, 21.0, 21.0, 21.0, 20.0, 19.0, 18.5, 6.5, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '13°C',
+        line: {color: '#1abc9c', width: 2},
+        hovertemplate: '13°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"], y: [52.0, 52.0, 52.5, 52.5, 41.5, 47.5, 50.5, 62.5, 56.5, 57.0, 55.0, 68.0, 48.5, 0.1, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '14°C',
+        line: {color: '#3498db', width: 2},
+        hovertemplate: '14°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"], y: [11.0, 10.5, 14.0, 23.0, 21.5, 26.5, 26.5, 31.5, 25.0, 12.5, 20.5, 22.5, 54.5, 50.5, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '15°C',
+        line: {color: '#9b59b6', width: 2},
+        hovertemplate: '15°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00"], y: [2.4, 2.4, 2.6, 5.5, 4.5, 4.0, 2.8, 2.9, 2.5, 1.6, 1.8, 2.5, 20.9, 87.5, 92.1, 99.7, 99.9, 99.9, 99.9, 100.0, 100.0, 100.0, 100.0],
+        type: 'scatter', mode: 'lines', name: '16°C',
+        line: {color: '#e84393', width: 2},
+        hovertemplate: '16°C: %{y:.1f}¢<extra></extra>'
+    },
+{
+        x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00"], y: [3.5, 3.5, 2.0, 1.8, 0.8, 0.8, 0.8, 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 8.5, 13.9, 7.4, 1.1, 0.4, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1],
+        type: 'scatter', mode: 'lines', name: '>=17°C',
+        line: {color: '#fd79a8', width: 2},
+        hovertemplate: '>=17°C: %{y:.1f}¢<extra></extra>'
+    },
+];
+Plotly.newPlot('priceChart', priceTraces, {
+  paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+  font: { color: '#c9d1d9', size: 12 },
+  margin: { l: 50, r: 30, t: 10, b: 50 },
+  height: 320,
+  xaxis: { gridcolor: '#21262d', title: 'Time (CET)' },
+  yaxis: { gridcolor: '#21262d', title: 'YES Price (cents)', dtick: 5 },
+  legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: { size: 10 }, x: 0.01, y: 0.99 },
+  hovermode: 'x unified'
+}, { responsive: true, displayModeBar: false });
+</script>
+
+<h2>Event Timeline</h2>
+<div class="legend" style="flex-wrap: wrap;">
+  <span><span class="dot dot-t1"></span> Floor NO T1 &mdash; running high crossed threshold (certain)</span>
+  <span><span class="dot dot-t2"></span> Floor NO T2 &mdash; forecast gap &ge; 4&deg;C at 9am</span>
+  <span><span class="dot dot-ceil"></span> Ceiling NO &mdash; after 16:00, bracket unreachable (&ge;2&deg;C above)</span>
+  <span><span class="dot dot-lock"></span> Locked-In YES &mdash; after 17:00, high rounds to bracket</span>
+</div>
+
+    <div class="event event-t1">
+      <div class="event-time">00:00<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong><=9°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 10&deg;C &ge; 9.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: N/A &rarr; Profit per $100: <span class='muted'>$0 &mdash; already repriced</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">01:00<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong>10°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 11&deg;C &ge; 10.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: 1% &rarr; Profit per $100: <span class='green'>$0.5</span></div>
+      </div>
+    </div>
+    <div class="event event-t2">
+      <div class="event-time">09:00<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E1; FLOOR NO &mdash; TIER 2 (FORECAST)</div>
+        <div class="event-action">Buy NO on <strong>11°C</strong> &mdash; forecast says dead</div>
+        <div class="event-detail">Forecast 15.7&deg;C &minus; 11&deg;C = 4.7&deg;C gap &ge; 4.0&deg;C buffer</div>
+        <div class="event-pnl">YES price: 1% &rarr; Profit per $100: <span class='green'>$0.6</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">11:30<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong>12°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 13&deg;C &ge; 12.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: 0% &rarr; Profit per $100: <span class='green'>$0.1</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">12:30<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong>13°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 14&deg;C &ge; 13.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: 0% &rarr; Profit per $100: <span class='green'>$0.1</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">13:30<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong>14°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 15&deg;C &ge; 14.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: 0% &rarr; Profit per $100: <span class='green'>$0.1</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">14:30<br>CET</div>
+      <div class="event-body">
+        <div class="event-tier">&#x1F7E2; FLOOR NO &mdash; TIER 1 (CERTAIN)</div>
+        <div class="event-action">Buy NO on <strong>15°C</strong> &mdash; bracket is dead</div>
+        <div class="event-detail">Running high reached 16&deg;C &ge; 15.5&deg;C kill threshold</div>
+        <div class="event-pnl">YES price: 0% &rarr; Profit per $100: <span class='green'>$0.1</span></div>
+      </div>
+    </div>
+
+<h2>All Brackets &amp; Outcomes</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Bracket</th><th>Volume</th><th>Signal</th><th>Action</th><th>Time</th><th>Final Outcome</th></tr></thead>
+  <tbody><tr>
+        <td><=9°C</td>
+        <td>$5,598</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>00:00</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>10°C</td>
+        <td>$2,779</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>01:00</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>11°C</td>
+        <td>$8,055</td>
+        <td>Floor NO (T2)</td>
+        <td>Buy NO</td>
+        <td>09:00</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>12°C</td>
+        <td>$2,739</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>11:30</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>13°C</td>
+        <td>$5,000</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>12:30</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>14°C</td>
+        <td>$4,360</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>13:30</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>15°C</td>
+        <td>$9,406</td>
+        <td>Floor NO (T1)</td>
+        <td>Buy NO</td>
+        <td>14:30</td>
+        <td class="green">Resolved NO</td>
+    </tr><tr>
+        <td>16°C</td>
+        <td>$13,190</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="winner">Resolved YES (winner)</td>
+    </tr><tr>
+        <td>>=17°C</td>
+        <td>$5,988</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="green">Resolved NO</td>
+    </tr></tbody>
+</table>
+</div>
+
+<div class="verdict">
+  <h3>Verdict for February 21, 2026</h3>
+  <p>The forecast of <strong>15.7&deg;C</strong> was accurate (actual: 16&deg;C).
+  Tier 2 correctly identified bracket(s) as dead before the running high confirmed them. 
+  
+  
+  All signals were <strong>correct</strong> &mdash; every trade would have been profitable.</p>
+  <p style="margin-top:8px">Total signals: <strong>7</strong> &bull; Actionable: <strong>6</strong> &bull;
+  Profit: <strong class="green">$1.5</strong> per $100/trade</p>
+</div>
+
+<h2>Near Misses &amp; What-Ifs</h2>
+<div class="section" style="font-size:13px;">
+  <table style="font-size:13px;">
+    <thead><tr><th>Strategy</th><th>Bracket</th><th>Why It Didn't Trigger</th><th>Missed Edge</th></tr></thead>
+    <tbody>
+      <tr>
+        <td style="color:#e74c3c">Ceiling NO</td>
+        <td>>=17°C</td>
+        <td>Gap was 1&deg;C, needed &ge;2&deg;C</td>
+        <td>YES was 7% at 4pm</td>
+      </tr>
+      <tr>
+        <td style="color:#58a6ff">Locked-In YES</td>
+        <td>16°C</td>
+        <td>YES was 100% at 5pm (&ge;80%)</td>
+        <td>Already efficiently priced</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px; color:#8b949e;">
+    <strong>Key insight:</strong> The &ge;17&deg;C bracket had 7&cent; YES at 4pm with a 1&deg;C gap.
+    If Ceiling NO used a 1&deg;C threshold instead of 2&deg;C, it would have captured $7/trade.
+    But the 2&deg;C threshold is safer &mdash; a 1&deg;C gap at 4pm isn't zero-risk in winter (a late warm front could spike by 1&deg;C).
+    The winning bracket (16&deg;C) was already 92% YES by 4pm and 100% by 5pm, so Locked-In YES had no opportunity.
+  </p>
+</div>
+
+<h2>Strategy Guide</h2>
+<div class="section" style="font-size:13px; color:#8b949e;">
+  <p><strong style="color:#2ecc71">Floor NO &mdash; Tier 1 (green)</strong><br>
+  Fires the instant METAR shows a new running high that crosses bracket_top + 0.5&deg;C. Zero risk &mdash; a temperature can never un-reach a high. We buy NO on that bracket.</p>
+  <p style="margin-top:10px"><strong style="color:#f1c40f">Floor NO &mdash; Tier 2 (yellow)</strong><br>
+  Fires once at 9am. If the forecast high minus bracket top &ge; 4.0&deg;C, we call the bracket dead early. Very high confidence, but carries small forecast risk.</p>
+  <p style="margin-top:10px"><strong style="color:#e74c3c">Ceiling NO (red)</strong><br>
+  After 16:00 CET, brackets whose floor is &ge; 2.0&deg;C above the running daily high are unreachable. The day is cooling and can't climb that much. We buy NO. Requires YES &ge; 3% to be worth it.</p>
+  <p style="margin-top:10px"><strong style="color:#58a6ff">Locked-In YES (blue)</strong><br>
+  After 17:00 CET, the daily high is essentially locked. If it rounds to a bracket and the market still prices YES below 80%, we buy YES before the market catches up.</p>
+  <p style="margin-top:12px"><strong>Temperature chart:</strong> Red = METAR (resolution source), green = SYNOP (0.1&deg;C), orange dashed = running high, yellow dash-dot = forecast.</p>
+  <p style="margin-top:4px"><strong>Price chart:</strong> YES price evolution per bracket. Dead brackets drain to 0&cent;, winner climbs to 100&cent;.</p>
+  <p style="margin-top:4px"><strong>Profit math:</strong> For NO trades, profit = YES price at signal &times; $100 (buy NO at 1&minus;YES, collect $1). For YES trades, profit = (1 &minus; YES price) &times; $100.</p>
+</div>
+
+</div>
+</body>
+</html>

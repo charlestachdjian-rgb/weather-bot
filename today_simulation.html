@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Today's Strategy 1 Simulation — Feb 22, 2026</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #e6edf3; } h2 { font-size: 17px; color: #e6edf3; margin: 28px 0 12px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #8b949e; margin-bottom: 20px; }
+  .green { color: #2ecc71; } .red { color: #e74c3c; } .yellow { color: #f1c40f; } .muted { color: #484f58; }
+  .winner { color: #58a6ff; font-weight: 600; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b949e; }
+  .kpi .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .kpi .detail { font-size: 11px; color: #8b949e; margin-top: 2px; }
+
+  #chart { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; height: 420px; }
+
+  .event { display: flex; gap: 16px; margin: 8px 0; padding: 12px 16px; border-radius: 8px; }
+  .event-t1 { background: #0d2818; border: 1px solid #238636; }
+  .event-t2 { background: #2d2200; border: 1px solid #d29922; }
+  .event-time { font-size: 14px; font-weight: 700; color: #e6edf3; min-width: 80px; padding-top: 2px; }
+  .event-body { flex: 1; }
+  .event-tier { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .event-action { font-size: 14px; color: #e6edf3; }
+  .event-detail { font-size: 12px; color: #8b949e; margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #30363d; color: #8b949e; font-size: 10px; text-transform: uppercase; }
+  td { padding: 6px 10px; border-bottom: 1px solid #21262d; }
+  tr:hover { background: #1c2333; }
+  .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin: 12px 0; }
+
+  .legend { display: flex; gap: 20px; font-size: 12px; margin: 8px 0; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-t1 { background: #2ecc71; }
+  .dot-t2 { background: #f1c40f; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Strategy 1 Simulation — February 22, 2026</h1>
+<div class="subtitle">
+  What our two-tier bracket-killing strategy would have done today at Paris CDG (LFPG) |
+  Generated 19:22 CET
+</div>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">WU Daily High</div>
+    <div class="value red">14°C</div>
+    <div class="detail">Resolution source (38 readings)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">SYNOP Daily High</div>
+    <div class="value green">14.1°C</div>
+    <div class="detail">0.1°C precision (same station)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Forecast High</div>
+    <div class="value yellow">14.4°C</div>
+    <div class="detail">Open-Meteo +1.0°C correction</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Trades Triggered</div>
+    <div class="value">5</div>
+    <div class="detail">5 Tier 1 + 0 Tier 2</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Profit</div>
+    <div class="value green">$0.5</div>
+    <div class="detail">Per $100 per trade</div>
+  </div>
+</div>
+
+<h2>Temperature + Running High</h2>
+<div id="chart"></div>
+<script>
+const traces = [
+  {
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"], y: [13, 12, 12, 13, 13, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 13, 12, 13, 12, 11, 11],
+    type: 'scatter', mode: 'lines+markers', name: 'METAR/WU (1°C)',
+    line: {color: '#e74c3c', width: 2}, marker: {size: 4},
+    hovertemplate: 'METAR: %{y}°C<br>%{x}<extra></extra>'
+  },
+  {
+    x: ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"], y: [12.4, 12.4, 12.3, 12.2, 12.2, 12.1, 11.9, 11.8, 12.0, 12.5, 12.8, 13.3, 13.6, 13.8, 14.1, 13.2, 12.4, 11.2],
+    type: 'scatter', mode: 'lines+markers', name: 'SYNOP (0.1°C)',
+    line: {color: '#2ecc71', width: 2}, marker: {size: 4},
+    hovertemplate: 'SYNOP: %{y:.1f}°C<br>%{x}<extra></extra>'
+  },
+  {
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"], y: [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
+    type: 'scatter', mode: 'lines', name: 'Running High',
+    line: {color: '#e67e22', width: 2.5, dash: 'dash'},
+    hovertemplate: 'Running High: %{y}°C<br>%{x}<extra></extra>'
+  }
+];
+
+// Add bracket lines
+const brackets = [{"label": "<=9\u00b0C", "hi": 9.0}, {"label": "10\u00b0C", "hi": 10.0}, {"label": "11\u00b0C", "hi": 11.0}, {"label": "12\u00b0C", "hi": 12.0}, {"label": "13\u00b0C", "hi": 13.0}, {"label": "14\u00b0C", "hi": 14.0}, {"label": "15\u00b0C", "hi": 15.0}, {"label": "16\u00b0C", "hi": 16.0}];
+brackets.forEach((b, i) => {
+  const killThreshold = b.hi + 0.5;
+  traces.push({
+    x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"], y: Array(38).fill(killThreshold),
+    type: 'scatter', mode: 'lines', name: b.label + ' kill line',
+    line: {color: 'rgba(150,150,150,0.25)', width: 1, dash: 'dot'},
+    showlegend: i === 0,
+    hovertemplate: b.label + ' dies at %{y}°C<extra></extra>'
+  });
+});
+
+const layout = {
+  paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+  font: { color: '#c9d1d9', size: 12 },
+  margin: { l: 50, r: 30, t: 20, b: 50 },
+  height: 400,
+  xaxis: { gridcolor: '#21262d', title: 'Time (CET)' },
+  yaxis: { gridcolor: '#21262d', title: 'Temperature (°C)', dtick: 1 },
+  legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: { size: 10 }, x: 0.01, y: 0.99 },
+  hovermode: 'x unified',
+  annotations: [{
+        x: '00:00', y: 13,
+        xref: 'x', yref: 'y',
+        text: 'T1: <=9°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.8)', bordercolor: '#2ecc71',
+        ax: 0, ay: -30
+    },{
+        x: '00:00', y: 13,
+        xref: 'x', yref: 'y',
+        text: 'T1: 10°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.8)', bordercolor: '#2ecc71',
+        ax: 0, ay: -30
+    },{
+        x: '00:00', y: 13,
+        xref: 'x', yref: 'y',
+        text: 'T1: 11°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.8)', bordercolor: '#2ecc71',
+        ax: 0, ay: -30
+    },{
+        x: '00:00', y: 13,
+        xref: 'x', yref: 'y',
+        text: 'T1: 12°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.8)', bordercolor: '#2ecc71',
+        ax: 0, ay: -30
+    },{
+        x: '13:00', y: 14,
+        xref: 'x', yref: 'y',
+        text: 'T1: 13°C DEAD',
+        showarrow: true, arrowhead: 2, arrowcolor: '#2ecc71',
+        font: { color: '#2ecc71', size: 10 },
+        bgcolor: 'rgba(13,17,23,0.8)', bordercolor: '#2ecc71',
+        ax: 0, ay: -30
+    }]
+};
+Plotly.newPlot('chart', traces, layout, { responsive: true, displayModeBar: false });
+</script>
+
+<h2>Event Timeline</h2>
+<div class="legend">
+  <span><span class="dot dot-t1"></span> Tier 1 — Running high passed bracket (certain)</span>
+  <span><span class="dot dot-t2"></span> Tier 2 — Forecast says bracket dead (4°C buffer)</span>
+</div>
+
+
+    <div class="event event-t1">
+      <div class="event-time">00:00 CET</div>
+      <div class="event-body">
+        <div class="event-tier">🟢 TIER 1 — CERTAIN</div>
+        <div class="event-action">Buy NO on <strong><=9°C</strong> — bracket is dead</div>
+        <div class="event-detail">Running high reached 13°C, exceeding <=9°C (need > 9.5°C)</div>
+        <div class="event-detail">YES price at kill: ? → Profit per $100: <span class="muted">no edge (already repriced)</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">00:00 CET</div>
+      <div class="event-body">
+        <div class="event-tier">🟢 TIER 1 — CERTAIN</div>
+        <div class="event-action">Buy NO on <strong>10°C</strong> — bracket is dead</div>
+        <div class="event-detail">Running high reached 13°C, exceeding 10°C (need > 10.5°C)</div>
+        <div class="event-detail">YES price at kill: ? → Profit per $100: <span class="muted">no edge (already repriced)</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">00:00 CET</div>
+      <div class="event-body">
+        <div class="event-tier">🟢 TIER 1 — CERTAIN</div>
+        <div class="event-action">Buy NO on <strong>11°C</strong> — bracket is dead</div>
+        <div class="event-detail">Running high reached 13°C, exceeding 11°C (need > 11.5°C)</div>
+        <div class="event-detail">YES price at kill: ? → Profit per $100: <span class="muted">no edge (already repriced)</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">00:00 CET</div>
+      <div class="event-body">
+        <div class="event-tier">🟢 TIER 1 — CERTAIN</div>
+        <div class="event-action">Buy NO on <strong>12°C</strong> — bracket is dead</div>
+        <div class="event-detail">Running high reached 13°C, exceeding 12°C (need > 12.5°C)</div>
+        <div class="event-detail">YES price at kill: ? → Profit per $100: <span class="muted">no edge (already repriced)</span></div>
+      </div>
+    </div>
+    <div class="event event-t1">
+      <div class="event-time">13:00 CET</div>
+      <div class="event-body">
+        <div class="event-tier">🟢 TIER 1 — CERTAIN</div>
+        <div class="event-action">Buy NO on <strong>13°C</strong> — bracket is dead</div>
+        <div class="event-detail">Running high reached 14°C, exceeding 13°C (need > 13.5°C)</div>
+        <div class="event-detail">YES price at kill: 0% → Profit per $100: <span class="green">$0.5</span></div>
+      </div>
+    </div>
+
+<h2>Bracket Status</h2>
+<div class="section">
+<table>
+  <thead><tr><th>Bracket</th><th>Current YES</th><th>Volume</th><th>Status</th><th>Killed By</th></tr></thead>
+  <tbody><tr>
+        <td><=9°C</td>
+        <td>0%</td>
+        <td>$2,865</td>
+        <td class="muted">CLOSED (resolved)</td>
+        <td>Tier 1</td>
+    </tr><tr>
+        <td>10°C</td>
+        <td>0%</td>
+        <td>$14,180</td>
+        <td class="muted">CLOSED (resolved)</td>
+        <td>Tier 1</td>
+    </tr><tr>
+        <td>11°C</td>
+        <td>0%</td>
+        <td>$1,087</td>
+        <td class="muted">CLOSED (resolved)</td>
+        <td>Tier 1</td>
+    </tr><tr>
+        <td>12°C</td>
+        <td>0%</td>
+        <td>$3,930</td>
+        <td class="muted">CLOSED (resolved)</td>
+        <td>Tier 1</td>
+    </tr><tr>
+        <td>13°C</td>
+        <td>0%</td>
+        <td>$8,573</td>
+        <td class="muted">CLOSED (resolved)</td>
+        <td>Tier 1</td>
+    </tr><tr>
+        <td>14°C</td>
+        <td>100%</td>
+        <td>$8,956</td>
+        <td class="winner">CURRENT BRACKET</td>
+        <td>-</td>
+    </tr><tr>
+        <td>15°C</td>
+        <td>0%</td>
+        <td>$15,568</td>
+        <td class="muted">alive</td>
+        <td>-</td>
+    </tr><tr>
+        <td>16°C</td>
+        <td>0%</td>
+        <td>$2,183</td>
+        <td class="muted">alive</td>
+        <td>-</td>
+    </tr><tr>
+        <td>>=17°C</td>
+        <td>0%</td>
+        <td>$5,496</td>
+        <td class="muted">alive</td>
+        <td>-</td>
+    </tr></tbody>
+</table>
+</div>
+
+<h2>How to Read This</h2>
+<div class="section" style="font-size:13px; color:#8b949e;">
+  <p><strong>The orange dashed line</strong> is the running daily high — it can only go up. Each time it crosses a bracket's kill threshold (dotted gray lines at bracket_top + 0.5°C), that bracket is permanently dead and we buy NO.</p>
+  <p style="margin-top:8px"><strong>Tier 1 (green)</strong> fires the instant METAR shows a new high that crosses a threshold. Zero risk — temperature can never un-reach a high.</p>
+  <p style="margin-top:8px"><strong>Tier 2 (yellow)</strong> fires at 9am based on the forecast. If the forecast high minus the bracket top is >= 4.0°C, we call the bracket dead early. Very high confidence but not 100%.</p>
+  <p style="margin-top:8px"><strong>Profit</strong> = the YES price at the time of the kill. If YES is 5%, buying NO at $0.95 means you collect $1.00 at resolution — $5 profit per $100. If YES is already 0%, there's no edge (market already repriced).</p>
+</div>
+
+</div>
+</body>
+</html>

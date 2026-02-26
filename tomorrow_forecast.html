@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tomorrow's Forecast - 2026-02-24</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                   color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .header h1 { margin: 0; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                 gap: 20px; margin-bottom: 30px; }
+        .stat { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .stat-label { color: #666; font-size: 0.9rem; margin-bottom: 5px; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .chart-container { background: white; padding: 30px; border-radius: 12px; 
+                           box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; 
+                margin-top: 20px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌡️ Tomorrow's Temperature Forecast</h1>
+            <p>Date: 2026-02-24 | Source: OpenMeteo | Location: Paris CDG</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Raw Forecast High</div>
+                <div class="stat-value">15.8°C</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Corrected High (+1°C bias)</div>
+                <div class="stat-value">16.8°C</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Forecast Low</div>
+                <div class="stat-value">10.1°C</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Peak Hour</div>
+                <div class="stat-value">16:00</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="forecastChart"></canvas>
+        </div>
+        
+        <div class="note">
+            <strong>Note:</strong> OpenMeteo historically underforecasts by ~1.0°C. 
+            The corrected high (16.8°C) is used for trading signals.
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"],
+                datasets: [{
+                    label: 'Raw Forecast',
+                    data: [12.1, 11.9, 11.7, 11.5, 11.5, 11.5, 11.5, 11.6, 11.6, 11.8, 12.3, 13.0, 13.6, 14.5, 15.5, 15.5, 15.8, 15.4, 14.5, 12.9, 11.9, 11.1, 10.6, 10.1],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Corrected (+1°C)',
+                    data: [13.1, 12.9, 12.7, 12.5, 12.5, 12.5, 12.5, 12.6, 12.6, 12.8, 13.3, 14.0, 14.6, 15.5, 16.5, 16.5, 16.8, 16.4, 15.5, 13.9, 12.9, 12.1, 11.6, 11.1],
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Hourly Temperature Forecast - 2026-02-24',
+                        font: { size: 18 }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '°C';
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Hour (CET)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

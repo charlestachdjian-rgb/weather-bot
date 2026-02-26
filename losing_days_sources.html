@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>The Two Losing Days — All Data Sources</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0d1117; color:#c9d1d9; padding:24px; line-height:1.6; }
+  .container { max-width:1100px; margin:0 auto; }
+  h1 { font-size:22px; color:#e6edf3; margin-bottom:4px; }
+  h2 { font-size:18px; color:#e6edf3; margin:28px 0 8px; border-bottom:1px solid #30363d; padding-bottom:6px; }
+  h3 { font-size:14px; color:#e6edf3; margin:16px 0 8px; }
+  .sub { font-size:13px; color:#8b949e; margin-bottom:20px; }
+  .day-sub { font-size:13px; color:#8b949e; margin-bottom:12px; }
+
+  .day-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:20px; margin:20px 0; }
+
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; padding:8px 12px; border-bottom:2px solid #30363d; color:#8b949e; font-size:11px; text-transform:uppercase; }
+  td { padding:8px 12px; border-bottom:1px solid #21262d; }
+
+  .trend-table { margin:16px 0; }
+
+  .verdict-box { background:#0d1117; border:1px solid #30363d; border-radius:8px; padding:16px; margin:16px 0; }
+  .verdict-box strong { font-size:15px; color:#e6edf3; }
+  .verdict-box p { margin-top:8px; font-size:13px; }
+  .verdict-yes { color:#2ecc71; font-weight:600; }
+  .verdict-no { color:#f1c40f; }
+
+  .conclusion { background:linear-gradient(135deg, #0d2818, #161b22); border:2px solid #238636;
+    border-radius:10px; padding:20px; margin:24px 0; }
+  .conclusion h3 { color:#2ecc71; font-size:16px; margin-bottom:10px; }
+  .conclusion p { font-size:14px; margin-top:8px; }
+  .conclusion code { background:#21262d; padding:2px 6px; border-radius:4px; font-size:13px; }
+</style></head><body>
+<div class="container">
+
+<h1>The Two Losing Days — What Were the Data Sources Saying?</h1>
+<div class="sub">
+  Feb 15 and Feb 18 both had late-evening temperature surges that broke the Ceiling NO and Locked-In YES strategies.
+  Could SYNOP or Open-Meteo have warned us?
+</div>
+
+
+    <div class="day-card">
+      <h2>February 15 — Actual high: 9°C</h2>
+      <p class="day-sub">
+        Lost trades: Ceiling NO on <strong>>=7°C</strong> at 4pm,
+        Locked-In YES on <strong>3°C</strong> at 5pm.
+        Winning bracket: <strong>>=7°C</strong>
+      </p>
+
+      <div id="chart0" style="height:420px"></div>
+      <script>
+      Plotly.newPlot('chart0', [
+        {
+          x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 8],
+          type: 'scatter', mode: 'lines+markers', name: 'METAR/WU (1°C)',
+          line: {color: '#e74c3c', width: 2}, marker: {size: 4},
+          hovertemplate: 'METAR: %{y}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"], y: [6.9, -1.0, -0.9, -0.8, -0.5, -0.4, -0.2, 0.1, 0.3, 0.6, 1.0, 1.2, 1.5, 1.7, 1.7, 2.2, 2.7, 3.1, 3.8, 4.9, 6.0, 7.6, 8.2, 8.9],
+          type: 'scatter', mode: 'lines+markers', name: 'SYNOP (0.1°C)',
+          line: {color: '#2ecc71', width: 2}, marker: {size: 5},
+          hovertemplate: 'SYNOP: %{y:.1f}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"], y: [-2.2, -2.3, -3.0, -2.6, -1.8, -1.9, -1.4, -1.0, -0.6, 0.1, 0.7, 1.2, 2.0, 3.2, 1.9, 2.1, 2.5, 3.0, 3.8, 5.2, 6.1, 6.9, 7.8, 7.3],
+          type: 'scatter', mode: 'lines+markers', name: 'Open-Meteo (model)',
+          line: {color: '#3498db', width: 2}, marker: {size: 4},
+          hovertemplate: 'Open-Meteo: %{y:.1f}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 8, 8, 9, 9],
+          type: 'scatter', mode: 'lines', name: 'Running High (METAR)',
+          line: {color: '#e67e22', width: 2, dash: 'dash'},
+          hovertemplate: 'Running high: %{y}°C<extra></extra>'
+        }
+      ], {
+        paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+        font: { color: '#c9d1d9', size: 12 },
+        margin: { l: 45, r: 20, t: 10, b: 45 },
+        xaxis: { gridcolor: '#21262d', title: 'Time (CET)' },
+        yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+        legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+        hovermode: 'x unified',
+        shapes: [
+          { type:'line', x0:'16:00', x1:'16:00', y0:0, y1:1, yref:'paper',
+             line:{color:'#e74c3c',width:2,dash:'dot'} },
+          { type:'line', x0:'17:00', x1:'17:00', y0:0, y1:1, yref:'paper',
+             line:{color:'#58a6ff',width:2,dash:'dot'} }
+        ],
+        annotations: [
+          { x:'16:00', y:1.02, yref:'paper', text:'Ceiling NO fires', showarrow:false,
+             font:{color:'#e74c3c',size:10}, bgcolor:'rgba(13,17,23,0.9)', bordercolor:'#e74c3c',
+             xanchor:'left', xshift:5 },
+          { x:'17:00', y:1.02, yref:'paper', text:'Locked-In YES fires', showarrow:false,
+             font:{color:'#58a6ff',size:10}, bgcolor:'rgba(13,17,23,0.9)', bordercolor:'#58a6ff',
+             xanchor:'left', xshift:5 }
+        ]
+      }, { responsive:true, displayModeBar:false });
+      </script>
+
+      <div class="trend-table">
+        <h3>What each source was saying at 4pm and 5pm</h3>
+        <table>
+          <thead><tr><th>Source</th><th>Temp at 4pm</th><th>Trend at 4pm</th><th>Temp at 5pm</th><th>Trend at 5pm</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>METAR/WU</td>
+              <td>3°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+              <td>3°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+            </tr>
+            <tr>
+              <td>SYNOP</td>
+              <td>2.7°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+              <td>3.1°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+            </tr>
+            <tr>
+              <td>Open-Meteo</td>
+              <td>2.5°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+              <td>3.0°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verdict-box">
+        <strong>Could we have avoided these losses?</strong>
+        <p>At 4pm, the temperature was at 3°C.</p>
+    
+        <p class="verdict-yes">YES — 3/3 sources showed a <strong>rising trend</strong> at 4pm
+        and 3/3 at 5pm.
+        A simple rule — <em>"don't fire Ceiling NO or Locked-In YES if ANY source shows a rising trend"</em> —
+        would have blocked both trades and saved us <strong>$200</strong> on this day.</p>
+        
+      </div>
+    </div>
+    
+    <div class="day-card">
+      <h2>February 18 — Actual high: 9°C</h2>
+      <p class="day-sub">
+        Lost trades: Ceiling NO on <strong>>=8°C</strong> at 4pm,
+        Locked-In YES on <strong>6°C</strong> at 5pm.
+        Winning bracket: <strong>>=8°C</strong>
+      </p>
+
+      <div id="chart1" style="height:420px"></div>
+      <script>
+      Plotly.newPlot('chart1', [
+        {
+          x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+          type: 'scatter', mode: 'lines+markers', name: 'METAR/WU (1°C)',
+          line: {color: '#e74c3c', width: 2}, marker: {size: 4},
+          hovertemplate: 'METAR: %{y}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "01:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"], y: [8.9, 4.1, 8.4, 4.0, 3.6, 3.2, 2.8, 2.4, 2.0, 2.0, 2.2, 2.9, 3.3, 4.0, 4.6, 5.1, 5.3, 5.5, 5.5, 5.9, 6.4, 7.3, 8.5, 8.8],
+          type: 'scatter', mode: 'lines+markers', name: 'SYNOP (0.1°C)',
+          line: {color: '#2ecc71', width: 2}, marker: {size: 5},
+          hovertemplate: 'SYNOP: %{y:.1f}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"], y: [3.2, 3.5, 3.5, 3.3, 2.4, 2.2, 2.0, 2.0, 1.8, 2.0, 2.5, 3.2, 3.9, 4.1, 4.8, 6.2, 5.9, 5.6, 5.7, 6.9, 7.7, 7.8, 8.1, 8.1],
+          type: 'scatter', mode: 'lines+markers', name: 'Open-Meteo (model)',
+          line: {color: '#3498db', width: 2}, marker: {size: 4},
+          hovertemplate: 'Open-Meteo: %{y:.1f}°C<br>%{x}<extra></extra>'
+        },
+        {
+          x: ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"], y: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9, 9],
+          type: 'scatter', mode: 'lines', name: 'Running High (METAR)',
+          line: {color: '#e67e22', width: 2, dash: 'dash'},
+          hovertemplate: 'Running high: %{y}°C<extra></extra>'
+        }
+      ], {
+        paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+        font: { color: '#c9d1d9', size: 12 },
+        margin: { l: 45, r: 20, t: 10, b: 45 },
+        xaxis: { gridcolor: '#21262d', title: 'Time (CET)' },
+        yaxis: { gridcolor: '#21262d', title: '°C', dtick: 1 },
+        legend: { bgcolor: 'rgba(22,27,34,0.9)', bordercolor: '#30363d', borderwidth: 1, font: {size: 10}, x: 0.01, y: 0.99 },
+        hovermode: 'x unified',
+        shapes: [
+          { type:'line', x0:'16:00', x1:'16:00', y0:0, y1:1, yref:'paper',
+             line:{color:'#e74c3c',width:2,dash:'dot'} },
+          { type:'line', x0:'17:00', x1:'17:00', y0:0, y1:1, yref:'paper',
+             line:{color:'#58a6ff',width:2,dash:'dot'} }
+        ],
+        annotations: [
+          { x:'16:00', y:1.02, yref:'paper', text:'Ceiling NO fires', showarrow:false,
+             font:{color:'#e74c3c',size:10}, bgcolor:'rgba(13,17,23,0.9)', bordercolor:'#e74c3c',
+             xanchor:'left', xshift:5 },
+          { x:'17:00', y:1.02, yref:'paper', text:'Locked-In YES fires', showarrow:false,
+             font:{color:'#58a6ff',size:10}, bgcolor:'rgba(13,17,23,0.9)', bordercolor:'#58a6ff',
+             xanchor:'left', xshift:5 }
+        ]
+      }, { responsive:true, displayModeBar:false });
+      </script>
+
+      <div class="trend-table">
+        <h3>What each source was saying at 4pm and 5pm</h3>
+        <table>
+          <thead><tr><th>Source</th><th>Temp at 4pm</th><th>Trend at 4pm</th><th>Temp at 5pm</th><th>Trend at 5pm</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>METAR/WU</td>
+              <td>6°C</td><td><span style='color:#8b949e'>&#x25CF; FLAT</span></td>
+              <td>6°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+            </tr>
+            <tr>
+              <td>SYNOP</td>
+              <td>5.5°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+              <td>5.5°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+            </tr>
+            <tr>
+              <td>Open-Meteo</td>
+              <td>5.9°C</td><td><span style='color:#e74c3c'>&#x25B2; RISING</span></td>
+              <td>5.6°C</td><td><span style='color:#2ecc71'>&#x25BC; FALLING</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verdict-box">
+        <strong>Could we have avoided these losses?</strong>
+        <p>At 4pm, the temperature was at 6°C.</p>
+    
+        <p class="verdict-yes">YES — 2/3 sources showed a <strong>rising trend</strong> at 4pm
+        and 2/3 at 5pm.
+        A simple rule — <em>"don't fire Ceiling NO or Locked-In YES if ANY source shows a rising trend"</em> —
+        would have blocked both trades and saved us <strong>$200</strong> on this day.</p>
+        
+      </div>
+    </div>
+    
+
+<div class="conclusion">
+  <h3>Conclusion: Add a Trend Safety Check</h3>
+  <p>On both losing days, at least one data source was already showing a <strong>rising temperature trend</strong>
+  at 4-5pm — the exact time our risky signals fired.</p>
+  <p>A simple safeguard would prevent these losses:</p>
+  <p style="margin-top:12px; padding:12px; background:#0d1117; border:1px solid #30363d; border-radius:6px; font-family:monospace; font-size:14px;">
+    if trend_at_signal_time == RISING on ANY source:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;→ do NOT fire Ceiling NO or Locked-In YES
+  </p>
+  <p style="margin-top:12px">This would have saved all 4 losing trades (-$400) while only blocking signals
+  that were going to lose anyway. The Floor NO strategy (T1 + T2) doesn't need this check —
+  it's already mathematically safe.</p>
+</div>
+
+</div></body></html>
