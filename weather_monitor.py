@@ -480,8 +480,9 @@ def should_block_risky_signal(
     metar_history: list[dict],
     synop_readings: list[dict],
     om_hourly: list[dict],
+    forecast_high: float | None = None,
 ) -> tuple[bool, list[str]]:
-    """Check 5 safeguards for Ceiling NO / Locked-In YES.
+    """Check 6 safeguards for Ceiling NO / Locked-In YES.
     Returns (should_block, list_of_reasons)."""
     reasons: list[str] = []
 
@@ -516,6 +517,10 @@ def should_block_risky_signal(
     vel = _synop_velocity(synop_readings, signal_hour)
     if vel > 0.3:
         reasons.append(f"SYNOP +{vel:.1f}°C/3h")
+
+    # Guard 6: Peak-reached check — only allow if daily high >= forecast - 0.5°C
+    if forecast_high is not None and running_high < forecast_high - 0.5:
+        reasons.append(f"Peak not reached: high {running_high:.1f}°C < forecast {forecast_high:.1f}°C - 0.5")
 
     return (len(reasons) > 0, reasons)
 
@@ -843,7 +848,7 @@ def detect_signals(markets: list[dict],
             if gap >= CEIL_GAP and yes > MIN_YES_FOR_ALERT:
                 blocked, reasons = should_block_risky_signal(
                     hour_local, daily_high, lo,
-                    metar_history, synop_history, om_hourly)
+                    metar_history, synop_history, om_hourly, forecast_high)
                 if not blocked:
                     # Signal would fire here, but keeping dormant for now
                     logger.info("CEIL_NO DORMANT (would fire): %s gap=%.1f°C YES=%.1f%% [guards passed]",
@@ -1239,8 +1244,8 @@ async def main() -> None:
     logger.info("  Layer 2:    Floor T2 — forecast kills lower bracket (%.0f°C buffer)", FORECAST_KILL_BUFFER)
     logger.info("  Layer 3:    T2 Upper — forecast kills upper bracket (%.0f°C + bias check)", UPPER_KILL_BUFFER)
     logger.info("  Layer 4:    Midday T2 — noon reassessment (%.1f°C buffer)", MIDDAY_KILL_BUFFER)
-    logger.info("  Layer 5:    Guarded Ceiling NO / Lock-In YES (5 safeguards)")
-    logger.info("  Guards:     OM peak hour | OM remaining max | OM vs bracket | trend | SYNOP velocity")
+    logger.info("  Layer 5:    Guarded Ceiling NO / Lock-In YES (6 safeguards)")
+    logger.info("  Guards:     OM peak hour | OM remaining max | OM vs bracket | trend | SYNOP velocity | peak reached")
     logger.info("  Poll:       %dmin (day) / %dmin (night)", POLL_MIN_DAY, POLL_MIN_NIGHT)
     logger.info("  Telegram:   %s", "enabled" if TELEGRAM_TOKEN else "disabled (no .env)")
     logger.info("  Log:        %s", LOG_FILE)
